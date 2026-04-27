@@ -3,10 +3,11 @@ const DB_ID = '2e2d8fce2e1880bea6b5fe0c8233ab79';
 function getProp(props, name, type) {
   const p = props[name];
   if (!p) return null;
-  if (type === 'title') return (p.title || []).map(t => t.plain_text).join('') || '';
-  if (type === 'select') return (p.select && p.select.name) || null;
-  if (type === 'status') return (p.status && p.status.name) || null;
-  if (type === 'rich_text') return (p.rich_text || []).map(t => t.plain_text).join('') || '';
+  if (type === 'title')      return (p.title || []).map(t => t.plain_text).join('') || '';
+  if (type === 'select')     return (p.select && p.select.name) || null;
+  if (type === 'status')     return (p.status && p.status.name) || null;
+  if (type === 'rich_text')  return (p.rich_text || []).map(t => t.plain_text).join('') || '';
+  if (type === 'checkbox')   return p.checkbox === true;
   return null;
 }
 
@@ -47,20 +48,30 @@ exports.handler = async function() {
 
     const clients = allPages.map(p => {
       const props = p.properties;
+
       const name = getProp(props, 'Client Name', 'title')
         || getProp(props, 'Name', 'title')
         || getProp(props, 'Client', 'title') || 'Unknown';
-      const status = getProp(props, 'Contract Status', 'status')
+
+      const contractStatus = getProp(props, 'Contract Status', 'status')
         || getProp(props, 'Contract Status', 'select')
         || getProp(props, 'Status', 'status')
         || getProp(props, 'Status', 'select') || null;
-      const notes = getProp(props, 'Contract Notes', 'rich_text')
+
+      const contractNotes = getProp(props, 'Contract Notes', 'rich_text')
         || getProp(props, 'Notes', 'rich_text') || '';
+
+      // Handle both "Folder" and "Folders" spellings
+      const folderDone = getProp(props, 'Folders', 'checkbox')
+        || getProp(props, 'Folder', 'checkbox')
+        || false;
+
       const clientType = getProp(props, 'Client Type', 'select')
         || getProp(props, 'Tier', 'select')
         || getProp(props, 'Type', 'select')
         || getProp(props, 'Service Tier', 'select') || 'Other';
-      return { id: p.id, name, status, notes, clientType };
+
+      return { id: p.id, name, contractStatus, contractNotes, folderDone, clientType };
     });
 
     clients.sort((a, b) => a.name.localeCompare(b.name));
@@ -74,7 +85,7 @@ exports.handler = async function() {
 
     return {
       statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'max-age=60' },
+      headers: { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'max-age=30' },
       body: JSON.stringify({ ok: true, total: clients.length, fieldNames, grouped, groupOrder, clients })
     };
   } catch(e) {
