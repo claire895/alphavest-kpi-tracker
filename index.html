@@ -1264,22 +1264,96 @@ function renderTaxesPage() {
 }
 
 function renderFoldersPage() {
-  var flDone=0; CLIENTS.forEach(function(c){if((S.cx[c.id]||{fl:false}).fl)flDone++;});
-  var flPct=pct(flDone,CLIENTS.length);
-  var outstanding=CLIENTS.filter(function(c){return !(S.cx[c.id]||{fl:false}).fl;}).map(function(c){return c.n.split(',')[0];});
-  var localBody='<div class="sg sg3" style="margin-bottom:14px">'
-    +'<div class="sc '+(flPct===100?'scg':'sca')+'"><div class="sl">Migrated</div><div class="sv">'+flDone+'</div><div class="ss">of '+CLIENTS.length+'</div></div>'
-    +'<div class="sc"><div class="sl">Outstanding</div><div class="sv">'+(CLIENTS.length-flDone)+'</div></div>'
-    +'<div class="sc"><div class="sl">Complete</div><div class="sv">'+flPct+'%</div></div>'
-    +'</div>';
-  localBody+='<div style="margin-bottom:14px"><div class="prb" style="height:9px"><div class="prf'+(flPct<50?' re':flPct<100?' am':'')+'" style="width:'+flPct+'%"></div></div></div>';
-  if(flPct<100)localBody+=alertBox(infoIcon()+' Outstanding: '+outstanding.join(', '),'ala');
-  else localBody+=alertBox(checkIcon()+' All folders migrated.','alg');
-  localBody+='<div class="card" style="padding:0"><div class="ts"><table><thead><tr><th>#</th><th>Client</th><th>Folder Status</th></tr></thead><tbody>';
-  CLIENTS.forEach(function(c,i){var fl=(S.cx[c.id]||{fl:false}).fl;localBody+='<tr style="background:'+(fl?'var(--greenl)':'')+'"><td style="font-family:var(--mono);font-size:11px;color:var(--txtl)">'+String(i+1).padStart(2,'0')+'</td><td style="font-weight:600;color:'+(fl?'var(--greend)':'')+'">'+c.n+'</td><td style="display:flex;align-items:center;gap:9px;padding:9px 13px"><input type="checkbox"'+(fl?' checked':'')+' onchange="updateCx(\''+c.id+'\',\'fl\',this.checked);render()"><span style="font-size:12px;color:'+(fl?'var(--green)':'var(--txtm)')+';">'+(fl?'Migrated \u2713':'Pending')+'</span></td></tr>';});
-  localBody+='</tbody></table></div></div>';
-  return notionPageShell('Folder Clean Up','SharePoint \u2192 Redtail \u00b7 Owner: Jackie','https://www.notion.so/2e2d8fce2e1880bea6b5fe0c8233ab79?v=342d8fce2e18806babb7000cb3ad4f94','#3b82f6',localBody);
+  var notionUrl = 'https://www.notion.so/2e2d8fce2e1880bea6b5fe0c8233ab79?v=342d8fce2e18806babb7000cb3ad4f94';
+  var notionSvg = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9"/><polyline points="9,1 13,1 13,5"/><line x1="7" y1="7" x2="13" y2="1"/></svg>';
+  var html = '<div class="sh"><div><div class="st">Folder Clean Up</div>'
+    + '<div class="su">Live from Notion · Read-only · Checkbox ticked in Notion = migrated · Owner: Jackie</div></div>'
+    + '<a href="'+notionUrl+'" target="_blank" class="btn bn" style="text-decoration:none;gap:6px">'+notionSvg+'Edit in Notion →</a></div>';
+  html += '<div id="foldersData"><div style="text-align:center;padding:52px;color:var(--txtm)">'
+    + '<div style="width:36px;height:36px;border:2px solid var(--bdr);border-top-color:var(--navy);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>'
+    + '<div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase">Loading from Notion…</div></div></div>';
+  setTimeout(fetchFolders, 0);
+  return html;
 }
+
+function fetchFolders() {
+  fetch('/.netlify/functions/notion-contracts')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var el = document.getElementById('foldersData');
+      if (!el) return;
+      if (data.error) { el.innerHTML = alertBox(warnIcon()+' Notion error: '+data.error, 'ala'); return; }
+
+      function cleanTier(t) { return t.replace(/^\d+\.\s*/, '').replace(' (Top 30)', '').replace(' (Hiers)', ''); }
+
+      // Active client types only for stats
+      var activeTypes = ['1. Alpha Client (Top 30)', '2. Legacy Client', '3. Anchor Client', '4. NexGen Client (Hiers)'];
+      var activeClients = data.clients.filter(function(c){ return activeTypes.indexOf(c.clientType) >= 0; });
+      var done  = activeClients.filter(function(c){ return c.folderDone; }).length;
+      var total = activeClients.length;
+      var pctV  = Math.round(done / total * 100);
+
+      var html = '<div class="sg sg3" style="margin-bottom:14px">'
+        + '<div class="sc '+(pctV===100?'scg':'sca')+'"><div class="sl">Migrated</div><div class="sv">'+done+'</div><div class="ss">of '+total+' active clients</div></div>'
+        + '<div class="sc"><div class="sl">Outstanding</div><div class="sv">'+(total-done)+'</div><div class="ss">still to move</div></div>'
+        + '<div class="sc '+(pctV===100?'scg':pctV>50?'sca':'')+'"><div class="sl">Complete</div><div class="sv">'+pctV+'%</div></div>'
+        + '</div>';
+      html += '<div style="margin-bottom:16px"><div class="prb" style="height:10px">'
+        + '<div class="prf'+(pctV<50?' re':pctV<100?' am':'')+'" style="width:'+pctV+'%"></div></div></div>';
+
+      if (done < total) {
+        var outstanding = activeClients.filter(function(c){ return !c.folderDone; }).map(function(c){ return c.name; });
+        html += alertBox(infoIcon()+' Outstanding: '+outstanding.join(', '), 'ala');
+      } else {
+        html += alertBox(checkIcon()+' All active client folders migrated.', 'alg');
+      }
+
+      var tierOrder = ['1. Alpha Client (Top 30)','2. Legacy Client','3. Anchor Client','4. NexGen Client (Hiers)','Inactive Clients','Family (No Fee)','Deceased','Other'];
+      var tierColors = {'1. Alpha Client (Top 30)':'var(--navy)','2. Legacy Client':'#7c3aed','3. Anchor Client':'#3b82f6','4. NexGen Client (Hiers)':'var(--green)'};
+      var inactiveTiers = ['Inactive Clients','Family (No Fee)','Deceased','Other'];
+
+      tierOrder.forEach(function(tier) {
+        var clients = data.grouped[tier];
+        if (!clients || !clients.length) return;
+        var isInactive = inactiveTiers.indexOf(tier) >= 0;
+        var tierDone  = clients.filter(function(c){ return c.folderDone; }).length;
+        var color     = tierColors[tier] || 'var(--txtl)';
+        var label     = cleanTier(tier);
+
+        html += '<div class="card" style="padding:0;margin-bottom:12px;border-top:3px solid '+color+';'+(isInactive?'opacity:.7':'')+';">';
+        html += '<div style="padding:12px 18px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr)">';
+        html += '<div style="font-family:var(--serif);font-size:16px;font-weight:700;color:var(--navy)">'+label+'</div>';
+        html += '<div style="font-size:11px;font-family:var(--mono);color:var(--txtm)">'+tierDone+'/'+clients.length+' migrated</div>';
+        html += '</div>';
+        html += '<div class="ts"><table><thead><tr><th>#</th><th>Client Name</th><th>Folder Status</th></tr></thead><tbody>';
+
+        clients.forEach(function(c, i) {
+          var done = c.folderDone;
+          html += '<tr style="background:'+(done?'var(--greenl)':'')+'">'
+            + '<td style="font-family:var(--mono);font-size:11px;color:var(--txtl)">'+String(i+1).padStart(2,'0')+'</td>'
+            + '<td style="font-weight:600;color:'+(done?'var(--greend)':'var(--navy)')+'">'+c.name+'</td>'
+            + '<td><div style="display:flex;align-items:center;gap:8px">'
+            + (done
+              ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--greend)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,7 6,11 12,3"/></svg><span style="font-size:12px;color:var(--greend)">Migrated</span>'
+              : '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--txtl)" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="6"/></svg><span style="font-size:12px;color:var(--txtm)">Pending</span>')
+            + '</div></td></tr>';
+        });
+
+        html += '</tbody></table></div></div>';
+      });
+
+      html += '<div style="text-align:right;font-size:10px;color:var(--txtl);font-family:var(--mono);margin-top:8px">'
+        + 'Synced from Notion at '+new Date().toLocaleTimeString()
+        + ' · <a href="#" onclick="fetchFolders();return false" style="color:var(--navy)">Refresh</a></div>';
+
+      el.innerHTML = html;
+    })
+    .catch(function(err) {
+      var el = document.getElementById('foldersData');
+      if (el) el.innerHTML = alertBox(warnIcon()+' Could not reach Notion: '+err.message, 'ala');
+    });
+}
+
 
 function renderContractsPage() {
   var notionUrl = 'https://www.notion.so/2e2d8fce2e1880bea6b5fe0c8233ab79?v=342d8fce2e188056aeed000c58e56876';
