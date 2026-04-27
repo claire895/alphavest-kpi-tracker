@@ -1,0 +1,7 @@
+{
+  "name": "alphavest-kpi-tracker",
+  "version": "2.0.0",
+  "dependencies": {
+    "@netlify/blobs": "^7.0.0"
+  }
+}

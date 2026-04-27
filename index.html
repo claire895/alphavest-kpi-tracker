@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alphavest KPI Tracker 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,600;1,700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#221c58;--navy2:#2a2368;--navym:#f0f0f8;
+  --green:#54aa3f;--greenl:#edf7ea;--greend:#3d8a2d;--greenm:#dff0da;
+  --red:#c0392b;--redl:#fdf3f2;
+  --amber:#b45309;--amberl:#fdf8ee;
+  --bdr:#e6e6ef;--bdrl:#f0f0f6;
+  --txt:#1a1a2e;--txtm:#6b6b82;--txtl:#a0a0b5;
+  --bg:#f4f4f8;--wh:#fff;
+  --serif:'Cormorant Garamond',serif;
+  --sans:'Outfit',sans-serif;
+  --mono:'DM Mono',monospace;
+  --sh:0 1px 3px rgba(34,28,88,.06),0 4px 12px rgba(34,28,88,.04);
+  --sat-thriving:#54aa3f;--sat-engaged:#3b82f6;--sat-neutral:#b45309;
+  --sat-risk:#c0392b;--sat-unknown:#a0a0b5;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--txt);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.hdr{background:var(--navy);color:#fff;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(34,28,88,.28)}
+.logo{display:flex;align-items:center;gap:14px}
+.wm{font-family:var(--sans);font-size:19px;font-weight:300;color:#fff}
+.wm em{font-style:italic;font-weight:400}.wm b{font-weight:600}
+.ldiv{width:1px;height:26px;background:rgba(255,255,255,.18)}
+.ldesc{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);line-height:1;white-space:nowrap}
+.hr{display:flex;align-items:center;gap:10px}
+.qps{display:flex;gap:2px;background:rgba(255,255,255,.07);border-radius:5px;padding:3px}
+.qp{padding:5px 10px;border-radius:3px;font-size:11px;cursor:pointer;border:none;color:rgba(255,255,255,.5);background:transparent;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;transition:all .15s}
+.qp:hover{color:#fff}.qp.on{background:var(--green);color:#fff}
+.vd{width:1px;height:22px;background:rgba(255,255,255,.14)}
+.mps{display:flex;gap:2px;background:rgba(255,255,255,.07);border-radius:5px;padding:3px}
+.mpb{padding:5px 10px;border-radius:3px;font-size:11px;cursor:pointer;border:none;color:rgba(255,255,255,.5);background:transparent;font-family:var(--sans);transition:all .15s}
+.mpb:hover{color:#fff}.mpb.on{background:rgba(255,255,255,.14);color:#fff}
+.hbtn{padding:6px 12px;border-radius:3px;font-size:11px;cursor:pointer;border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.65);background:transparent;font-family:var(--sans);transition:all .15s}
+.hbtn:hover{background:rgba(255,255,255,.1);color:#fff}
+/* ── MAIN NAV ── */
+.mainnav{background:var(--wh);border-bottom:1px solid var(--bdr);display:flex;align-items:stretch;padding:0 28px;position:relative;z-index:50}
+.mainnav::-webkit-scrollbar{display:none}
+.mnav-item{display:flex;align-items:center;gap:6px;padding:0 14px;height:46px;font-family:var(--sans);font-size:12px;font-weight:400;cursor:pointer;border:none;background:transparent;color:var(--txtm);white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.mnav-item:hover{color:var(--navy)}
+.mnav-item.active{color:var(--navy);border-bottom-color:var(--green);font-weight:600}
+.mnav-item .ti,.mnav-parent .ti{flex-shrink:0;opacity:.6;transition:opacity .15s;display:flex}
+.mnav-item.active .ti,.mnav-item:hover .ti,.mnav-parent.active .ti,.mnav-parent:hover .ti{opacity:1}
+.mnav-group{position:relative;display:flex;align-items:stretch}
+.mnav-parent{display:flex;align-items:center;gap:6px;padding:0 14px;height:46px;font-family:var(--sans);font-size:12px;font-weight:400;cursor:pointer;border:none;background:transparent;color:var(--txtm);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.mnav-parent:hover{color:var(--navy)}
+.mnav-parent.active{color:var(--navy);border-bottom-color:var(--green);font-weight:600}
+.mnav-chevron{font-size:7px;opacity:.45;margin-left:2px;display:inline-block;transition:transform .2s}
+.mnav-group.open .mnav-chevron{transform:rotate(180deg)}
+.mnav-group.open .mnav-drop{display:block}
+.mnav-drop{display:none;position:absolute;top:calc(100% + 1px);left:0;background:var(--wh);border:1px solid var(--bdr);border-radius:8px;box-shadow:0 8px 28px rgba(34,28,88,.12);min-width:200px;padding:6px;z-index:300}
+.mnav-group.open .mnav-drop{display:block}
+.mnav-sub{display:flex;align-items:center;gap:9px;width:100%;padding:9px 12px;font-family:var(--sans);font-size:12px;font-weight:400;cursor:pointer;border:none;background:transparent;color:var(--txtm);border-radius:5px;text-align:left;transition:all .12s;white-space:nowrap}
+.mnav-sub:hover{background:var(--bg);color:var(--navy)}
+.mnav-sub.active{background:var(--greenl);color:var(--greend);font-weight:600}
+.mnav-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtl);padding:6px 12px 3px}
+.pg{padding:24px 28px;max-width:1300px;margin:0 auto}
+.card{background:var(--wh);border-radius:8px;border:1px solid var(--bdr);padding:20px;margin-bottom:14px;box-shadow:var(--sh)}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.ct{font-size:13px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:8px}
+/* PERSON CARDS */
+.pc{background:var(--wh);border-radius:8px;border:1px solid var(--bdr);margin-bottom:14px;box-shadow:var(--sh);overflow:hidden}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--bdr)}
+.pname{font-family:var(--serif);font-size:21px;font-weight:700;color:var(--navy);letter-spacing:-.01em}
+.prole{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtm);margin-top:2px}
+.pbonus{text-align:right;font-size:11px;color:var(--txtm);font-family:var(--mono)}
+.pbval{font-family:var(--serif);font-size:20px;font-weight:700;display:block;margin-top:2px}
+.pbsub{display:block;margin-top:1px;font-size:10px;color:var(--txtl)}
+.kg{display:grid;gap:0}
+.kg4{grid-template-columns:repeat(4,1fr)}
+.kg2{grid-template-columns:repeat(2,1fr)}
+.kc{padding:14px 18px;border-right:1px solid var(--bdrl);position:relative}
+.kc:last-child{border-right:none}
+.kc.gate{background:rgba(34,28,88,.018)}
+.knum{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtl);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.klbl{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:7px}
+.kval{font-family:var(--serif);font-size:24px;font-weight:700;color:var(--navy);line-height:1;margin-bottom:3px}
+.ksub{font-size:11px;color:var(--txtm)}
+.kbar{height:4px;background:var(--bdr);border-radius:2px;margin-top:8px;overflow:hidden}
+.kfill{height:100%;border-radius:2px;transition:width .5s}
+.kfg{background:var(--green)}.kfa{background:var(--amber)}.kfr{background:var(--red)}
+.kdot{position:absolute;top:12px;right:12px;width:7px;height:7px;border-radius:50%}
+.dg{background:var(--green)}.dr{background:var(--red)}.da{background:var(--amber)}.dy{background:#c0c0cc}.db{background:#3b82f6}
+.gpill{display:inline-flex;align-items:center;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;padding:2px 5px;border-radius:2px;background:var(--navym);color:var(--navy)}
+/* STAT GRID */
+.sg{display:grid;gap:12px;margin-bottom:18px}
+.sg3{grid-template-columns:repeat(3,1fr)}.sg4{grid-template-columns:repeat(4,1fr)}.sg2{grid-template-columns:repeat(2,1fr)}
+.sc{background:var(--wh);border-radius:8px;border:1px solid var(--bdr);padding:16px 18px;box-shadow:var(--sh);border-left:3px solid var(--bdrl)}
+.scg{border-left-color:var(--green)}.scr{border-left-color:var(--red)}.sca{border-left-color:var(--amber)}.scn{border-left-color:var(--navy)}
+.sl{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtm);margin-bottom:9px}
+.sv{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--navy);line-height:1}
+.ss{font-size:11px;color:var(--txtm);margin-top:4px}
+/* SATISFACTION CHART */
+.sat-chart{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:start}
+.sat-donut-wrap{position:relative;width:160px;height:160px;margin:0 auto}
+.sat-donut-wrap svg{width:160px;height:160px}
+.sat-legend{display:flex;flex-direction:column;gap:8px;padding-top:4px}
+.sat-leg-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}
+.sat-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sat-leg-name{flex:1;color:var(--txt)}
+.sat-leg-count{font-family:var(--mono);font-size:12px;color:var(--txtm);text-align:right}
+.sat-client-list{margin-top:14px;display:flex;flex-wrap:wrap;gap:5px}
+.sat-chip{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+/* TABLES */
+.ts{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 13px;background:var(--bg);color:var(--txtm);font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--bdr)}
+td{padding:9px 13px;border-bottom:1px solid var(--bdrl);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafd}
+/* FORM */
+.fp{background:var(--bg);border:1px solid var(--bdr);border-radius:7px;padding:16px;margin-bottom:14px;display:none}
+.fp.open{display:block}
+.fgrp{display:flex;flex-direction:column;gap:4px}
+.fgrp label{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtm)}
+.fgr{display:grid;gap:10px;margin-bottom:10px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}
+input[type=text],input[type=date],input[type=number],select,textarea{border:1px solid var(--bdr);border-radius:5px;padding:7px 10px;font-size:13px;font-family:var(--sans);color:var(--txt);background:var(--wh);width:100%;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(84,170,63,.08)}
+input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--green)}
+.fa{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid var(--bdr)}
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.bn{background:var(--navy);color:#fff}.bn:hover{background:var(--navy2)}
+.bgn{background:var(--green);color:#fff}.bgn:hover{background:var(--greend)}
+.bo{background:var(--wh);color:var(--navy);border:1px solid var(--bdr)}.bo:hover{border-color:var(--navy)}
+.bgh{background:transparent;color:var(--txtm);border:1px solid var(--bdr)}.bgh:hover{color:var(--navy)}
+.bd{background:transparent;color:var(--red);border:1px solid #f5c6c2}.bd:hover{background:var(--redl)}
+.xs{padding:4px 8px;font-size:11px;border-radius:3px}.sm{padding:6px 12px}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:3px;font-size:11px;font-weight:500;font-family:var(--mono)}
+.bgg{background:var(--greenm);color:#1a5c10;border:1px solid #b8e3b0}
+.bgr{background:var(--redl);color:#8b1a14;border:1px solid #f0c0bc}
+.bga{background:var(--amberl);color:#78400a;border:1px solid #f0d898}
+.bgna{background:var(--navym);color:var(--navy);border:1px solid #d8d8f0}
+.alert{padding:10px 14px;border-radius:6px;font-size:13px;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.alr{background:var(--redl);border-left:3px solid var(--red);color:#6b1a14}
+.alg{background:var(--greenl);border-left:3px solid var(--green);color:#1a5c10}
+.ala{background:var(--amberl);border-left:3px solid var(--amber);color:#78400a}
+/* PROGRESS */
+.pr{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.prl{font-size:12px;flex-shrink:0;width:160px;color:var(--txtm)}
+.prb{flex:1;height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.prf{height:100%;border-radius:3px;transition:width .5s;background:var(--green)}
+.prf.am{background:var(--amber)}.prf.re{background:var(--red)}
+.prc{font-family:var(--mono);font-size:11px;color:var(--txtm);width:48px;text-align:right}
+/* TOUCH PILLS */
+.tp{padding:2px 7px;border-radius:3px;font-size:10px;font-weight:500;font-family:var(--mono);letter-spacing:.02em}
+.tpc{background:#eff4ff;color:#2d4fb5;border:1px solid #d4e0fc}
+.tpm{background:var(--greenl);color:#1a5c10;border:1px solid #b8e3b0}
+.tpe{background:#f4f0ff;color:#5b21b6;border:1px solid #ddd0fc}
+.tpp{background:#fff2ec;color:#8c3a14;border:1px solid #fdd0b8}
+.tpg{background:var(--amberl);color:#78400a;border:1px solid #f0d898}
+.tpv{background:#fef0f8;color:#831a5b;border:1px solid #f8c8e8}
+/* COLLAPSIBLE */
+.cr{border:1px solid var(--bdr);border-radius:7px;margin-bottom:6px;overflow:hidden}
+.crh{display:flex;align-items:center;padding:10px 14px;cursor:pointer;background:var(--wh);gap:10px;transition:background .12s}
+.crh:hover{background:var(--bg)}.crh.hit{background:var(--greenl)}
+.crb{display:none;padding:14px;border-top:1px solid var(--bdr);background:var(--bg)}
+/* CALENDAR GRID */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:16px}
+.cal-head{text-align:center;font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtl);padding:6px 0}
+.cal-day{background:var(--wh);border:1px solid var(--bdr);border-radius:6px;padding:8px;min-height:80px}
+.cal-day.empty{background:transparent;border-color:transparent}
+.cal-day.weekend{background:var(--bg);border-color:var(--bdrl)}
+.cal-day.today{border-color:var(--navy);border-width:2px}
+.cal-day-num{font-family:var(--mono);font-size:11px;color:var(--txtm);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.cal-day-num.work{color:var(--navy);font-weight:600}
+.cal-check{display:flex;align-items:center;gap:5px;font-size:11px;margin-bottom:3px;cursor:pointer;color:var(--txtm)}
+.cal-check input{width:13px;height:13px;flex-shrink:0;accent-color:var(--green)}
+.cal-check.done{color:var(--green)}
+/* BUDGET */
+.bud-bar{height:8px;background:var(--bdr);border-radius:4px;overflow:hidden;margin-top:5px}
+.bud-fill{height:100%;border-radius:4px;transition:width .5s}
+/* MILESTONE */
+.mi{display:flex;align-items:center;gap:10px;padding:11px 16px;background:var(--wh);border:1px solid var(--bdr);border-radius:7px;margin-bottom:7px;border-left-width:3px;box-shadow:var(--sh)}
+.mt{flex:1;font-size:13px;font-weight:500}
+.mot{font-size:10px;padding:3px 8px;border-radius:3px;background:var(--navym);color:var(--navy);font-weight:500;font-family:var(--mono)}
+.mdt{font-size:11px;color:var(--txtm);font-family:var(--mono)}
+/* REVENUE */
+.rs{display:grid;gap:12px;margin-bottom:18px}
+.rs3{grid-template-columns:repeat(3,1fr)}
+.rc{border-radius:8px;padding:22px;text-align:center}
+.rcn{background:var(--navy);color:#fff}
+.rcg{background:var(--greenl);border:1px solid #b8e3b0}
+.rv{font-family:var(--serif);font-size:32px;font-weight:700;line-height:1;margin-bottom:5px}
+.rl{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;opacity:.7}
+/* SECTION HEADER */
+.sh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:12px}
+.st{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--navy);margin-bottom:3px;letter-spacing:-.01em;line-height:1.15}
+.su{font-size:12px;color:var(--txtm);max-width:560px;line-height:1.55}
+.cp{font-size:11px;padding:3px 9px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;margin:2px}
+.uz{border:1px dashed var(--bdr);border-radius:8px;padding:40px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;background:var(--wh)}
+.uz:hover{border-color:var(--green);background:var(--greenl)}
+@media(max-width:900px){.kg4{grid-template-columns:repeat(2,1fr)}.kc:nth-child(2){border-right:none}.kc:nth-child(3),.kc:nth-child(4){border-top:1px solid var(--bdrl)}.sat-chart{grid-template-columns:1fr}}
+@media(max-width:700px){.sg3,.sg4{grid-template-columns:1fr 1fr}.rs3{grid-template-columns:1fr}.c3{grid-template-columns:1fr 1fr}.sv{font-size:24px}.pg{padding:16px}.hdr,.tabs{padding-left:14px;padding-right:14px}.cal-grid{grid-template-columns:repeat(7,1fr)}}
+
+/* SHARED ICON STYLES */
+.ti{flex-shrink:0;opacity:.6;transition:opacity .15s;display:flex}
+.ti svg{display:block}
+.ci{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;flex-shrink:0}
+.ci-navy{background:var(--navym)}.ci-navy svg{stroke:var(--navy)}
+.ci-amber{background:var(--amberl)}.ci-amber svg{stroke:var(--amber)}
+/* YEAR TOGGLE */
+.yr-toggle{display:flex;gap:2px;background:rgba(255,255,255,.07);border-radius:5px;padding:3px}
+.yrb{padding:5px 10px;border-radius:3px;font-size:11px;cursor:pointer;border:none;color:rgba(255,255,255,.5);background:transparent;font-family:var(--mono);letter-spacing:.06em;transition:all .15s}
+.yrb:hover{color:#fff}.yrb.on{background:rgba(255,255,255,.18);color:#fff}
+/* 2025 ANNUAL DASHBOARD */
+.yr-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.yr-qcard{background:var(--wh);border-radius:8px;border:1px solid var(--bdr);overflow:hidden;box-shadow:var(--sh)}
+.yr-qcard-head{padding:12px 16px;background:var(--navy);color:#fff}
+.yr-qcard-title{font-family:var(--serif);font-size:18px;font-weight:700;letter-spacing:-.01em}
+.yr-qcard-sub{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;opacity:.6;margin-top:2px}
+.yr-qcard-body{padding:14px 16px}
+.yr-field{margin-bottom:10px}
+.yr-field label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtm);display:block;margin-bottom:4px}
+.yr-field input{border:1px solid var(--bdr);border-radius:5px;padding:6px 9px;font-size:13px;font-family:var(--sans);color:var(--txt);background:var(--wh);width:100%}
+.yr-field input:focus{outline:none;border-color:var(--green)}
+.yr-metric{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bdrl);font-size:12px}
+.yr-metric:last-child{border-bottom:none}
+.yr-metric-label{color:var(--txtm)}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="logo">
+    <img src="data:image/png;base64,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" alt="Alphavest" style="height:36px;width:auto;object-fit:contain">
+    <div class="ldiv"></div>
+    <div class="ldesc" style="font-size:11px;letter-spacing:.08em;white-space:nowrap">KPI Tracker 2026</div>
+  </div>
+  <div class="hr">
+    <div class="qps" id="qPills"></div>
+    <div class="vd"></div>
+    <div class="mps" id="mPills"></div>
+    <div class="vd"></div>
+    <div class="yr-toggle" id="yrToggle"></div>
+    <div class="vd"></div>
+    <button class="hbtn" onclick="exportData()">&#x2193; Export</button>
+    <label class="hbtn" style="cursor:pointer">&#x2191; Import<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+  </div>
+</div>
+<nav class="mainnav" id="mainNav">
+
+  <button class="mnav-item active" data-tab="dash"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="4.5" height="4.5" rx=".8"/><rect x="8.5" y="1" width="4.5" height="4.5" rx=".8"/><rect x="1" y="8.5" width="4.5" height="4.5" rx=".8"/><rect x="8.5" y="8.5" width="4.5" height="4.5" rx=".8"/></svg></span>Dashboard</button>
+
+  <div class="mnav-group" id="grp-kpi">
+    <button class="mnav-parent" ><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,11 4.5,7 7.5,9 13,3"/><polyline points="9.5,3 13,3 13,6.5"/></svg></span>KPI Trackers <span class="mnav-chevron">&#x25BC;</span></button>
+    <div class="mnav-drop">
+      <div class="mnav-label">KPI Trackers</div>
+      <button class="mnav-sub" data-tab="ret"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="4" r="2.2"/><path d="M1 12.5c0-2.2 1.8-3.8 4-3.8s4 1.6 4 3.8"/><circle cx="11" cy="4.5" r="1.8"/><path d="M10 12.5c0-1.8 1.4-2.8 3-2.8"/></svg></span>Retention</button>
+      <button class="mnav-sub" data-tab="tch"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l4.5 10 2-4 4-2z"/></svg></span>Touch Log</button>
+      <button class="mnav-sub" data-tab="grw"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,11 4.5,7 7.5,9 13,3"/><polyline points="9.5,3 13,3 13,6.5"/></svg></span>New Growth</button>
+      <button class="mnav-sub" data-tab="cal"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="12" height="10" rx="1.5"/><line x1="1" y1="7" x2="13" y2="7"/><line x1="4.5" y1="1" x2="4.5" y2="5"/><line x1="9.5" y1="1" x2="9.5" y2="5"/></svg></span>Calendar &amp; Email</button>
+    </div>
+  </div>
+
+  <div class="mnav-group" id="grp-conc">
+    <button class="mnav-parent" ><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="7,1.5 8.5,5.5 13,5.8 9.8,8.7 10.8,13 7,10.8 3.2,13 4.2,8.7 1,5.8 5.5,5.5"/></svg></span>Client Concierge <span class="mnav-chevron">&#x25BC;</span></button>
+    <div class="mnav-drop">
+      <div class="mnav-label">Client Concierge</div>
+      <button class="mnav-sub" data-tab="exp"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="7,1.5 8.5,5.5 13,5.8 9.8,8.7 10.8,13 7,10.8 3.2,13 4.2,8.7 1,5.8 5.5,5.5"/></svg></span>Concierge Tracker</button>
+      <button class="mnav-sub" data-tab="bud"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="9" width="3" height="4" rx=".5"/><rect x="5.5" y="6" width="3" height="7" rx=".5"/><rect x="10" y="3" width="3" height="10" rx=".5"/></svg></span>Budget Tracker</button>
+    </div>
+  </div>
+
+  <div class="mnav-group" id="grp-sp">
+    <button class="mnav-parent"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="7,1 13,7 7,13 1,7"/></svg></span>Special Projects <span class="mnav-chevron">&#x25BC;</span></button>
+    <div class="mnav-drop">
+      <div class="mnav-label">Special Projects</div>
+      <button class="mnav-sub" data-tab="sp"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="4.5" height="4.5" rx=".8"/><rect x="8.5" y="1" width="4.5" height="4.5" rx=".8"/><rect x="1" y="8.5" width="4.5" height="4.5" rx=".8"/><rect x="8.5" y="8.5" width="4.5" height="4.5" rx=".8"/></svg></span>Overview</button>
+      <div class="mnav-divider"></div>
+      <button class="mnav-sub" data-tab="folio"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,10 4,5 7,8 10,3 13,6"/><polyline points="10,3 13,3 13,6"/></svg></span>Folio &#x2192; Schwab</button>
+      <button class="mnav-sub" data-tab="taxes"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 1h5l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/><polyline points="9,1 9,4 12,4"/><line x1="4.5" y1="7" x2="9.5" y2="7"/><line x1="4.5" y1="10" x2="9.5" y2="10"/></svg></span>Taxes</button>
+      <button class="mnav-sub" data-tab="folders"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M1 4h5l1.5-2H13a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/></svg></span>Folder Clean Up</button>
+      <button class="mnav-sub" data-tab="contracts"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 1h5l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/><polyline points="9,1 9,4 12,4"/><line x1="4.5" y1="7.5" x2="9.5" y2="7.5"/><line x1="4.5" y1="10" x2="7.5" y2="10"/></svg></span>Contracts</button>
+      <button class="mnav-sub" data-tab="dossiers"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="5" cy="4" r="2.2"/><path d="M1 12.5c0-2.2 1.8-3.8 4-3.8s4 1.6 4 3.8"/><line x1="9" y1="4" x2="13" y2="4"/><line x1="9" y1="7" x2="13" y2="7"/></svg></span>Client Dossiers</button>
+    </div>
+  </div>
+
+  <button class="mnav-item" data-tab="rev"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="9" r="4.5"/><path d="M7 7.5V4M5.5 5.5L7 4l1.5 1.5"/></svg></span>Revenue</button>
+  <button class="mnav-item" data-tab="ms"><span class="ti"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="1" x2="3" y2="13"/><path d="M3 2.5L12 5.5L3 8.5" fill="none"/></svg></span>Key Milestones</button>
+
+</nav>
+<div class="pg" id="pg"></div>
+<input type="file" id="xlFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleXL(event)">
+<script>
+
+// ICONS
+var SVG = {
+  warn:  '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 1L11 10.5H1Z"/><line x1="6" y1="4.5" x2="6" y2="7"/><circle cx="6" cy="9" r=".5" fill="currentColor" stroke="none"/></svg>',
+  check: '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>',
+  info:  '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><line x1="6" y1="5" x2="6" y2="8.5"/><circle cx="6" cy="3.5" r=".5" fill="currentColor" stroke="none"/></svg>',
+  folio: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="1" y="3" width="12" height="10" rx="1.5"/><path d="M4 3V2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="7" y2="10"/></svg>',
+  ira:   '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="7" cy="7" r="5.5"/><line x1="7" y1="4.5" x2="7" y2="7.5"/><circle cx="7" cy="9.5" r=".5" fill="currentColor" stroke="none"/></svg>'
+};
+function icn(k) { return SVG[k] || ''; }
+function warnIcon() { return '<span style="display:inline-flex;align-items:center;flex-shrink:0">'+SVG.warn+'</span>'; }
+function checkIcon() { return '<span style="display:inline-flex;align-items:center;flex-shrink:0">'+SVG.check+'</span>'; }
+function infoIcon() { return '<span style="display:inline-flex;align-items:center;flex-shrink:0">'+SVG.info+'</span>'; }
+
+var QM = {Q1:['January','February','March'],Q2:['April','May','June'],Q3:['July','August','September'],Q4:['October','November','December']};
+var QS = ['Q1','Q2','Q3','Q4'];
+var CLIENTS = [
+  {id:'c01',n:'BAXLEY, Johnnie & Michelle',cx:'Done'},
+  {id:'c02',n:'BRADY, Kathleen & Bruce',cx:'Done'},
+  {id:'c03',n:'KUCHENBECKER, Todd & Karen',cx:'Done'},
+  {id:'c04',n:'HERBERT, Deborah & Casey',cx:'Done'},
+  {id:'c05',n:'COOK, Judith',cx:'Not Started'},
+  {id:'c06',n:'WHITE, Caroline',cx:'Not Started'},
+  {id:'c07',n:'ZEIF, Margarita',cx:'Done'},
+  {id:'c08',n:'SHERMAN, Leigh',cx:'Not Started'},
+  {id:'c09',n:'TUMBLESTON, Benny & Alex',cx:'Done'},
+  {id:'c10',n:'SANTOS, Al & Barbara Julius',cx:'Not Started'},
+  {id:'c11',n:'GREGORY, Al & Nancy',cx:'Not Started'},
+  {id:'c12',n:'SCHNEIDER, Kimberly',cx:'Not Started'},
+  {id:'c13',n:'BRZEZINSKI, Jessie',cx:'Not Started'},
+  {id:'c14',n:'GURLEY, Jimmie',cx:'Done'},
+  {id:'c15',n:'COOPER, Elisa',cx:'Not Started'},
+  {id:'c16',n:'WESTBROOK, Juli',cx:'Not Started'},
+  {id:'c17',n:'GURLEY, Mike',cx:'Not Started'},
+  {id:'c18',n:'JOHNSON, Ellen',cx:'Done'},
+  {id:'c19',n:'WALKER, Gail E',cx:'Done'},
+  {id:'c20',n:'STORY, Diane',cx:'Not Started'},
+  {id:'c21',n:'CASSELS, Kathleen',cx:'Done'},
+  {id:'c22',n:'MARCONI, David & Ann',cx:'Done'},
+  {id:'c23',n:'CONE, Christy',cx:'Done'},
+  {id:'c24',n:'GURLEY, Brandon & Kim',cx:'Not Started'},
+  {id:'c25',n:'COLE, Jean Hobby Holmes',cx:'Not Started'}
+];
+var SAT_OPTS = ['','Thriving','Engaged','Neutral','At Risk','Unknown'];
+var TOUCH_TYPES = ['Call','Meeting','Email','Personal Outreach','Gift','Event'];
+var MTG_STATS = ['Scheduled','Confirmed','Completed','Rescheduled','Missed'];
+var CONC_TYPES = ['Gift','Event Invitation','Personal Note','Milestone Acknowledgment','Birthday','Seasonal Touch','Other'];
+var OWNERS = ['Kenson','Catherine','Jackie','Heidi','Cokie'];
+var MS_STATS = ['Not Started','In Progress','Done','Blocked'];
+var REF_STATS = ['New','Contacted','Meeting Set','Proposal Sent','Became Client','Not a Fit'];
+var KEY = 'av_kpi_2026_v7';
+// Budget constants
+var ANNUAL_BUDGET = 21000;
+var MONTHLY_BUDGET = 1750;
+var PER_CLIENT_ANNUAL = 700;
+var CONC_QTR_BUDGET = 5000; // $5K per quarter for Top 30 concierge
+
+// Folio migration statuses
+var FOLIO_STATS = ['Not Started','Contacted','Paperwork Sent','Paperwork Received','Account Opened','Transferred','Complete'];
+// IRA statuses
+var IRA_STATS = ['Not Contacted','Contacted — No Response','In Progress','Contributed','Declined','N/A'];
+
+function fresh() {
+  var cx = {}; CLIENTS.forEach(function(c){ cx[c.id] = {st:c.cx, fl:false, nt:''}; });
+  var bills = {}; QS.forEach(function(q){ bills[q] = []; });
+  return {q:'Q2', yr:2026, viewYear:2026, mo:0, ret:{}, touches:[], gr:{refs:[],exp:[],opp:[]}, mtgs:[], calNotes:'', calChecks:{}, conc:[], cx:cx, ms:[], bills:bills, folio:[], ira:[],
+    annual2025:{
+      Q1:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},
+      Q2:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},
+      Q3:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},
+      Q4:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''}
+    }
+  };
+}
+var S = fresh();
+function loadState() {
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) {
+      var p = JSON.parse(raw);
+      S = Object.assign(fresh(), p);
+      if (!S.gr) S.gr = {refs:[],exp:[],opp:[]};
+      ['refs','exp','opp'].forEach(function(k){ if(!S.gr[k]) S.gr[k]=[]; });
+      if (!S.bills) { S.bills={}; QS.forEach(function(q){S.bills[q]=[];}); }
+      if (!S.calChecks) S.calChecks = {};
+      if (!S.folio) S.folio = [];
+      if (!S.ira) S.ira = [];
+      if (!S.viewYear) S.viewYear = 2026;
+      if (!S.annual2025) S.annual2025 = {Q1:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},Q2:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},Q3:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},Q4:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''}};
+      if (!S.viewYear) S.viewYear = 2026;
+      if (!S.annual2025) S.annual2025 = {Q1:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},Q2:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},Q3:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},Q4:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''}};
+      CLIENTS.forEach(function(c){ if(!S.cx[c.id]) S.cx[c.id]={st:c.cx,fl:false,nt:''}; });
+    }
+  } catch(e) { S = fresh(); }
+}
+function saveState() { localStorage.setItem(KEY, JSON.stringify(S)); }
+function uid() { return Math.random().toString(36).substr(2,9); }
+function money(n) { return (n||0).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}); }
+function pct(n,t) { return t ? Math.round(n/t*100) : 0; }
+
+// Month helpers
+function getMonthNumber() { return QS.indexOf(S.q) * 3 + S.mo; } // 0-11
+function getDaysInMonth(yr, m) { return new Date(yr, m+1, 0).getDate(); }
+function getFirstDayOfWeek(yr, m) { return new Date(yr, m, 1).getDay(); } // 0=Sun
+function isWeekend(yr, m, d) { var day = new Date(yr, m, d).getDay(); return day===0||day===6; }
+function isToday(yr, m, d) { var now=new Date(); return now.getFullYear()===yr&&now.getMonth()===m&&now.getDate()===d; }
+function dateStr(yr, m, d) { return yr+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
+function calKey(ds) { return S.q+'_'+S.mo+'_'+ds; }
+
+function monthKey(mo) { return S.q+'_'+mo; }
+function getRet(cid, mo) { return S.ret[cid+'_'+monthKey(mo)] || {active:true, sat:'', note:''}; }
+function setRet(cid, mo, field, val) {
+  var k = cid+'_'+monthKey(mo);
+  if (!S.ret[k]) S.ret[k]={active:true,sat:'',note:''};
+  S.ret[k][field]=val; saveState();
+}
+function getBilling() { return (S.bills&&S.bills[S.q])||[]; }
+function setBilling(rows) { if(!S.bills) S.bills={}; S.bills[S.q]=rows; saveState(); }
+
+var curTab = 'dash';
+function setTab(t) {
+  curTab = t;
+  // Close all groups
+  document.querySelectorAll('.mnav-group').forEach(function(g){ g.classList.remove('open'); });
+  // Update active states on mnav-items and subs
+  document.querySelectorAll('.mnav-item').forEach(function(b){ b.classList.toggle('active', b.dataset.tab===t); });
+  document.querySelectorAll('.mnav-sub').forEach(function(b){ b.classList.toggle('active', b.dataset.tab===t); });
+  // If active tab is in a group, mark parent active too
+  var subBtns = {'ret':'grp-kpi','tch':'grp-kpi','grw':'grp-kpi','cal':'grp-kpi','exp':'grp-conc','bud':'grp-conc','folio':'grp-sp','taxes':'grp-sp','folders':'grp-sp','contracts':'grp-sp','dossiers':'grp-sp'};
+  if (subBtns[t]) {
+    var grp = document.getElementById(subBtns[t]);
+    if (grp) grp.querySelector('.mnav-parent').classList.add('active');
+  }
+  render();
+}
+
+function setQuarter(q) { S.q=q; S.mo=0; saveState(); buildPills(); render(); }
+function setMonth(i) { S.mo=i; saveState(); buildPills(); render(); }
+function setViewYear(y) { S.viewYear=y; saveState(); buildPills(); if(curTab==='dash') render(); }
+function buildPills() {
+  var months = QM[S.q];
+  document.getElementById('qPills').innerHTML = QS.map(function(q){ return '<button class="qp'+(q===S.q?' on':'')+'" onclick="setQuarter(\''+q+'\')">'+q+'</button>'; }).join('');
+  document.getElementById('mPills').innerHTML = months.map(function(m,i){ return '<button class="mpb'+(i===S.mo?' on':'')+'" onclick="setMonth('+i+')">'+m.substr(0,3)+'</button>'; }).join('');
+}
+function render() {
+  var el = document.getElementById('pg');
+  try {
+    if      (curTab==='dash') el.innerHTML = S.viewYear===2025 ? renderDash2025() : renderDash();
+    else if (curTab==='ret')  el.innerHTML = renderRet();
+    else if (curTab==='tch')  el.innerHTML = renderTouches();
+    else if (curTab==='grw')  el.innerHTML = renderGrowth();
+    else if (curTab==='cal')  el.innerHTML = renderCalendar();
+    else if (curTab==='exp')  el.innerHTML = renderExperience();
+    else if (curTab==='bud')  el.innerHTML = renderBudget();
+    else if (curTab==='ms')   el.innerHTML = renderMilestones();
+    else if (curTab==='sp')        el.innerHTML = renderSpecialProjects();
+    else if (curTab==='folio')     el.innerHTML = renderFolioPage();
+    else if (curTab==='taxes')     el.innerHTML = renderTaxesPage();
+    else if (curTab==='folders')   el.innerHTML = renderFoldersPage();
+    else if (curTab==='contracts') el.innerHTML = renderContractsPage();
+    else if (curTab==='dossiers')  el.innerHTML = renderDossiersPage();
+    else if (curTab==='rev')  el.innerHTML = renderRevenue();
+  } catch(e) {
+    el.innerHTML = '<div class="alert alr" style="margin:20px"><strong>Error:</strong> '+e.message+'</div>';
+    console.error(e);
+  }
+}
+function statusDot(cls) { return '<span class="kdot '+cls+'"></span>'; }
+function kbar(v, max, col) { var w=max?Math.min(Math.round(v/max*100),100):0; return '<div class="kbar"><div class="kfill '+(col||'kfg')+'" style="width:'+w+'%"></div></div>'; }
+function badge(txt, cls) { return '<span class="badge '+cls+'">'+txt+'</span>'; }
+function alertBox(msg, cls) { return '<div class="alert '+cls+'">'+msg+'</div>'; }
+function tog(id) { document.getElementById(id).classList.toggle('open'); }
+function today() { return new Date().toISOString().split('T')[0]; }
+
+/* ─── SATISFACTION CHART ─── */
+var SAT_COLORS = {Thriving:'#54aa3f',Engaged:'#3b82f6',Neutral:'#b45309','At Risk':'#c0392b',Unknown:'#a0a0b5','':'#e0e0e8'};
+var SAT_BG = {Thriving:'#edf7ea',Engaged:'#eff4ff',Neutral:'#fdf8ee','At Risk':'#fdf3f2',Unknown:'#f4f4f8','':'#f4f4f8'};
+var SAT_LABELS = ['Thriving','Engaged','Neutral','At Risk','Unknown','Not Set'];
+function renderSatChart(mo) {
+  var N = CLIENTS.length;
+  var counts = {Thriving:0, Engaged:0, Neutral:0, 'At Risk':0, Unknown:0, '':0};
+  var byStatus = {Thriving:[], Engaged:[], Neutral:[], 'At Risk':[], Unknown:[], '':[]};
+  CLIENTS.forEach(function(c) {
+    var e = getRet(c.id, mo);
+    var s = e.sat||'';
+    counts[s]++;
+    byStatus[s].push(c.n.split(',')[0]);
+  });
+  // Build donut SVG
+  var cx=80, cy=80, r=64, r2=40;
+  var segments = [];
+  var total = N;
+  var startAngle = -Math.PI/2;
+  Object.keys(counts).forEach(function(s) {
+    if (counts[s] === 0) return;
+    var angle = (counts[s]/total) * Math.PI * 2;
+    var endAngle = startAngle + angle;
+    var x1=cx+r*Math.cos(startAngle), y1=cy+r*Math.sin(startAngle);
+    var x2=cx+r*Math.cos(endAngle),   y2=cy+r*Math.sin(endAngle);
+    var x3=cx+r2*Math.cos(endAngle),  y3=cy+r2*Math.sin(endAngle);
+    var x4=cx+r2*Math.cos(startAngle),y4=cy+r2*Math.sin(startAngle);
+    var large = angle > Math.PI ? 1 : 0;
+    var col = SAT_COLORS[s]||'#e0e0e8';
+    segments.push('<path d="M'+x1+','+y1+' A'+r+','+r+' 0 '+large+',1 '+x2+','+y2+' L'+x3+','+y3+' A'+r2+','+r2+' 0 '+large+',0 '+x4+','+y4+' Z" fill="'+col+'" stroke="'+col+'" stroke-width="0.5"/>');
+    startAngle = endAngle;
+  });
+  var atRisk = byStatus['At Risk'];
+  var neutral = byStatus['Neutral'];
+  var svg = '<svg viewBox="0 0 160 160" style="width:140px;height:140px">'+segments.join('')+'<text x="80" y="76" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="28" font-weight="700" fill="#221c58">'+N+'</text><text x="80" y="93" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="#6b6b82">CLIENTS</text></svg>';
+
+  var html = '<div class="card">';
+  html += '<div class="ch"><div class="ct" style="font-family:var(--serif);font-size:18px;font-weight:700;color:var(--navy)">Client Satisfaction &mdash; '+QM[S.q][mo]+'</div></div>';
+
+  // Alert for at-risk
+  if (atRisk.length > 0) {
+    html += alertBox(warnIcon()+' <strong>'+atRisk.length+' At Risk:</strong> '+atRisk.join(', ')+' &mdash; Proactive outreach needed this week.', 'alr');
+  }
+  if (neutral.length > 0) {
+    html += alertBox(infoIcon()+' <strong>'+neutral.length+' Neutral:</strong> '+neutral.join(', ')+' &mdash; Monitor closely, consider a check-in call.', 'ala');
+  }
+  if (atRisk.length===0 && neutral.length===0 && counts['']===0) {
+    html += alertBox(checkIcon()+' All clients rated Thriving or Engaged.', 'alg');
+  }
+
+  html += '<div class="sat-chart">';
+  html += '<div style="text-align:center">'+svg+'</div>';
+  html += '<div class="sat-legend">';
+  var dispLabels = [['Thriving','Thriving'],['Engaged','Engaged'],['Neutral','Neutral'],['At Risk','At Risk'],['Unknown','Unknown'],['','Not Set']];
+  dispLabels.forEach(function(pair) {
+    var s=pair[0], lbl=pair[1];
+    if (counts[s]===0) return;
+    html += '<div class="sat-leg-row">';
+    html += '<span class="sat-leg-dot" style="background:'+SAT_COLORS[s]+'"></span>';
+    html += '<span class="sat-leg-name">'+lbl+'</span>';
+    html += '<span class="sat-leg-count">'+counts[s]+'</span>';
+    var w = Math.round(counts[s]/N*100);
+    html += '<div style="width:80px;height:5px;background:var(--bdr);border-radius:3px;overflow:hidden;flex-shrink:0"><div style="width:'+w+'%;height:100%;background:'+SAT_COLORS[s]+';border-radius:3px"></div></div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+
+  // Client chips grouped by status
+  if (counts['At Risk'] > 0 || counts['Neutral'] > 0) {
+    html += '<div style="margin-top:14px;border-top:1px solid var(--bdrl);padding-top:12px">';
+    html += '<div style="font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtl);margin-bottom:8px">Clients needing attention</div>';
+    html += '<div class="sat-client-list">';
+    byStatus['At Risk'].forEach(function(n){ html += '<span class="sat-chip" style="background:var(--redl);color:#8b1a14;border:1px solid #f0c0bc">&#x26A0; '+n+'</span>'; });
+    byStatus['Neutral'].forEach(function(n){ html += '<span class="sat-chip" style="background:var(--amberl);color:#78400a;border:1px solid #f0d898">&#x26A8; '+n+'</span>'; });
+    html += '</div></div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+/* ─── DASHBOARD ─── */
+function renderDash() {
+  var N=CLIENTS.length, months=QM[S.q], mn=months[S.mo], mk0=monthKey(S.mo);
+  var retained=CLIENTS.filter(function(c){return getRet(c.id,S.mo).active;}).length;
+  var atRisk=CLIENTS.filter(function(c){return getRet(c.id,S.mo).sat==='At Risk';}).length;
+  var retPct=pct(retained,N), gateOk=retained===N;
+  var touchSet={}; S.touches.filter(function(t){return t.mo===mk0;}).forEach(function(t){touchSet[t.cid]=true;});
+  var touched=Object.keys(touchSet).length;
+  var mtgQ=S.mtgs.filter(function(m){return m.q===S.q;});
+  var mtgComp=mtgQ.filter(function(m){return m.st==='Completed';}).length;
+  var mtgMiss=mtgQ.filter(function(m){return m.st==='Missed';}).length;
+  var calPct=mtgQ.length?pct(mtgComp,mtgQ.length):0;
+  var refs=S.gr.refs.filter(function(r){return r.q===S.q;}).length;
+  var exps=S.gr.exp.filter(function(e){return e.q===S.q;}).length;
+  var concQ=S.conc.filter(function(c){return c.q===S.q;});
+  var concSpent=concQ.reduce(function(s,c){return s+(c.am||0);},0);
+  var concOk=concQ.length>=7&&concQ.length<=12&&concSpent<=5000;
+  var cxDone=Object.values(S.cx).filter(function(x){return x.st==='Done';}).length;
+  var flDone=Object.values(S.cx).filter(function(x){return x.fl;}).length;
+  var bill=getBilling(), billTot=bill.reduce(function(s,b){return s+(b.am||0);},0);
+  var billOver=Math.max(0,billTot-180000), kBonus=billOver*.05;
+  var cBase=billTot>=180000?1000:0, cBonus=cBase+billOver*.05;
+  var kPart1=gateOk?money(1000):'$0', cPart1=gateOk?money(1400):'$0';
+
+  // Dot helpers
+  function retDot(){return retained===N?'dg':atRisk>0?'da':'dr';}
+  function retBarCol(){return retained===N?'kfg':atRisk>0?'kfa':'kfr';}
+  var rDot=calPct===100&&mtgQ.length>0?'dg':mtgMiss>0?'dr':'da';
+  var gDot=refs>=2&&exps>=1?'dg':refs>0||exps>0?'da':'dr';
+  var coDot=concOk?'dg':concQ.length>0?'da':'dr';
+  var cfDot=cxDone===N&&flDone===N?'dg':cxDone>0?'da':'dr';
+
+  var html = '<div class="sh"><div>'
+    + '<div class="st">'+S.q+' '+S.yr+' &mdash; '+mn+'</div>'
+    + '<div class="su">Gatekeeper: any Top 30 client lost resets Part 1 bonus to $0 for both advisors. Cokie approves at quarter-close.</div>'
+    + '</div></div>';
+
+  if (!gateOk) html += alertBox(warnIcon()+' <strong>Gatekeeper triggered</strong> &mdash; '+(N-retained)+' Top 30 client'+(N-retained>1?'s':'')+' inactive. Part 1 $0 for both. Escalate to Cokie immediately.', 'alr');
+
+  // ══ SECTION 1: REVENUE ══
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">';
+  html += '<div style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--navy)">Revenue</div>';
+  html += '<div style="flex:1;height:1px;background:var(--bdr)"></div>';
+  html += '<button class="btn bo xs" onclick="setTab(\'rev\')">Full Report &rarr;</button>';
+  html += '</div>';
+
+  if (billTot === 0) {
+    html += '<div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;margin-bottom:22px">';
+    html += '<div><div style="font-size:13px;color:var(--txtm)">No billing data for '+S.q+'. Upload to see commission calculations.</div></div>';
+    html += '<button class="btn bn" onclick="setTab(\'rev\')">Upload Billing &rarr;</button></div>';
+  } else {
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:22px">';
+    // Total billed
+    html += '<div class="sc scn" style="border-left-width:0;background:var(--navy);border-color:var(--navy)">'
+      + '<div class="sl" style="color:rgba(255,255,255,.6)">'+S.q+' Total Billed</div>'
+      + '<div class="sv" style="color:#fff;font-size:28px">'+money(billTot)+'</div>'
+      + '<div class="ss" style="color:rgba(255,255,255,.5)">'+(billTot>=180000?'&#x2713; Baseline met':'&#x26A0; Below $180K baseline')+'</div>'
+      + '</div>';
+    // Kenson bonus
+    html += '<div class="sc scg">'
+      + '<div class="sl">Kenson Part 2</div>'
+      + '<div class="sv" style="color:var(--greend)">'+money(kBonus)+'</div>'
+      + '<div class="ss">'+money(billOver)+' &times; 5%</div>'
+      + '</div>';
+    // Catherine bonus
+    html += '<div class="sc scg">'
+      + '<div class="sl">Catherine Part 2</div>'
+      + '<div class="sv" style="color:var(--greend)">'+money(cBonus)+'</div>'
+      + '<div class="ss">'+(cBase>0?money(1000)+' base + ':'')+money(billOver*.05)+'</div>'
+      + '</div>';
+    // All quarters mini-bar
+    html += '<div class="sc" style="padding:14px 16px">';
+    html += '<div class="sl" style="margin-bottom:8px">All Quarters</div>';
+    QS.forEach(function(q){
+      var qBill=(S.bills&&S.bills[q])||[], qTot=qBill.reduce(function(s,b){return s+(b.am||0);},0);
+      var qPct=Math.min(pct(qTot,180000),100);
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">';
+      html += '<div style="font-family:var(--mono);font-size:9px;width:18px;color:var(--txtm)">'+q+'</div>';
+      html += '<div class="prb" style="flex:1;height:5px"><div class="prf'+(qPct<100?' am':'')+'" style="width:'+qPct+'%;'+(q===S.q?'background:var(--navy)':'')+'"></div></div>';
+      html += '<div style="font-family:var(--mono);font-size:9px;color:var(--txtm);width:40px;text-align:right">'+(qTot>0?money(qTot).replace('$',''):'\u2014')+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '</div>'; // end revenue grid
+  }
+
+  // ══ SECTION 2: SPECIAL PROJECTS SNAPSHOT ══
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">';
+  html += '<div style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--navy)">Special Projects</div>';
+  html += '<div style="flex:1;height:1px;background:var(--bdr)"></div>';
+  html += '<button class="btn bo xs" onclick="setTab(\'sp\')">All Projects &rarr;</button>';
+  html += '</div>';
+
+  var folio=S.folio||[], fDone=folio.filter(function(r){return r.st==='Complete';}).length;
+  var dLeft=Math.ceil((new Date('2026-06-30')-new Date())/86400000);
+  var spProjects=[
+    {label:'Folio \u2192 Schwab',val:fDone+'/132',sub:dLeft+'d left',pct:folio.length>0?pct(fDone,folio.length):0,col:'var(--navy)',tab:'folio'},
+    {label:'Contracts',val:cxDone+'/'+N,sub:(N-cxDone)+' outstanding',pct:pct(cxDone,N),col:'var(--green)',tab:'contracts'},
+    {label:'Folder Clean Up',val:flDone+'/'+N,sub:(N-flDone)+' remaining',pct:pct(flDone,N),col:'#3b82f6',tab:'folders'},
+    {label:'Client Dossiers',val:'Notion',sub:'Open to review',pct:-1,col:'var(--amber)',tab:'dossiers'}
+  ];
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px">';
+  spProjects.forEach(function(p){
+    html += '<div onclick="setTab(\''+p.tab+'\')" style="cursor:pointer;background:var(--wh);border-radius:8px;border:1px solid var(--bdr);border-top:3px solid '+p.col+';padding:14px 16px;box-shadow:var(--sh);transition:box-shadow .15s">';
+    html += '<div style="font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtm);margin-bottom:6px">'+p.label+'</div>';
+    html += '<div style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--navy);margin-bottom:3px">'+p.val+'</div>';
+    html += '<div style="font-size:11px;color:var(--txtm);margin-bottom:'+(p.pct>=0?'8':'0')+'px">'+p.sub+'</div>';
+    if(p.pct>=0){
+      html += '<div class="prb" style="height:4px"><div class="prf'+(p.pct<50?' re':p.pct<100?' am':'')+'" style="width:'+p.pct+'%;background:'+p.col+'"></div></div>';
+    }
+    html += '<div style="font-size:10px;color:var(--txtm);font-family:var(--mono);margin-top:6px;opacity:.6">View &rsaquo;</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // ══ SECTION 3: PEOPLE / KPIs ══
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">';
+  html += '<div style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--navy)">Team KPIs</div>';
+  html += '<div style="flex:1;height:1px;background:var(--bdr)"></div>';
+  html += '<span style="font-size:11px;color:var(--txtm);font-family:var(--mono)">'+S.q+' &middot; '+mn+'</span>';
+  html += '</div>';
+
+  // Kenson
+  html += '<div class="pc" style="margin-bottom:10px"><div class="ph">'
+    + '<div><div class="pname">Kenson Marbut</div><div class="prole">Associate Advisor &middot; Operations &amp; Client Relations</div></div>'
+    + '<div class="pbonus"><span>Part 1 &mdash; up to $1,000/qtr</span>'
+    + '<span class="pbval" style="color:'+(gateOk?'var(--greend)':'var(--red)')+'">'+kPart1+(gateOk?'':' &mdash; Gatekeeper')+'</span>'
+    + '<span class="pbsub">Part 2: '+(billTot>0?money(kBonus)+' accelerator':'upload billing')+'</span></div></div>'
+    + '<div class="kg kg4">';
+  var tDot=touched===N?'dg':touched>=20?'da':'dr';
+  var gSub=refs>=2&&exps>=1?'All targets met &#x2713;':refs<2?(2-refs)+' more referral'+(2-refs>1?'s':'')+' needed':'1 expansion needed';
+  html += '<div class="kc gate">'+statusDot(retDot())+'<div class="knum"><span class="gpill">Gatekeeper</span> KPI 1</div><div class="klbl">Retention &mdash; '+mn+'</div><div class="kval">'+retained+'/'+N+'</div><div class="ksub">'+retPct+'% active &middot; '+atRisk+' at risk</div>'+kbar(retained,N,retBarCol())+'</div>';
+  html += '<div class="kc">'+statusDot(tDot)+'<div class="knum">KPI 2</div><div class="klbl">Monthly Touch Cadence</div><div class="kval">'+touched+'/'+N+'</div><div class="ksub">'+mn+' &middot; '+pct(touched,N)+'% touched</div>'+kbar(touched,N,tDot==='dg'?'kfg':tDot==='da'?'kfa':'kfr')+'</div>';
+  html += '<div class="kc">'+statusDot(rDot)+'<div class="knum">KPI 3</div><div class="klbl">Quarterly Reviews</div><div class="kval">'+mtgComp+'/'+(mtgQ.length||'&mdash;')+'</div><div class="ksub">'+(mtgQ.length?calPct+'% complete'+(mtgMiss>0?' &middot; '+mtgMiss+' missed':''):'No meetings logged')+'</div>'+kbar(mtgComp,mtgQ.length||1,rDot==='dg'?'kfg':rDot==='da'?'kfa':'kfr')+'</div>';
+  html += '<div class="kc">'+statusDot(gDot)+'<div class="knum">KPI 4</div><div class="klbl">Growth Pipeline</div><div class="kval" style="font-size:18px">'+refs+'/2 refs &middot; '+exps+'/1 exp</div><div class="ksub">'+gSub+'</div>'+kbar(Math.min(refs,2)+Math.min(exps,1),3,gDot==='dg'?'kfg':gDot==='da'?'kfa':'kfr')+'</div>';
+  html += '</div></div>';
+
+  // Catherine
+  html += '<div class="pc" style="margin-bottom:10px"><div class="ph">'
+    + '<div><div class="pname">Catherine Ginn</div><div class="prole">Client Experience Coordinator</div></div>'
+    + '<div class="pbonus"><span>Part 1 &mdash; up to $1,400/qtr</span>'
+    + '<span class="pbval" style="color:'+(gateOk?'var(--greend)':'var(--red)')+'">'+cPart1+(gateOk?'':' &mdash; Gatekeeper')+'</span>'
+    + '<span class="pbsub">Part 2: '+(billTot>0?money(cBonus)+' fee bonus':'upload billing')+'</span></div></div>'
+    + '<div class="kg kg4">';
+  html += '<div class="kc gate">'+statusDot(retDot())+'<div class="knum"><span class="gpill">Gatekeeper</span> KPI 1</div><div class="klbl">Retention &mdash; Shared</div><div class="kval">'+retained+'/'+N+'</div><div class="ksub">'+retPct+'% active &middot; '+atRisk+' at risk</div>'+kbar(retained,N,retBarCol())+'</div>';
+  html += '<div class="kc">'+statusDot(rDot)+'<div class="knum">KPI 2</div><div class="klbl">Calendar Execution</div><div class="kval">'+(mtgQ.length?mtgComp+'/'+mtgQ.length:'&mdash;')+'</div><div class="ksub">'+(mtgQ.length?calPct+'% completed'+(mtgMiss>0?' &middot; '+mtgMiss+' missed':''):'No reviews scheduled')+'</div>'+kbar(mtgComp,mtgQ.length||1,rDot==='dg'?'kfg':rDot==='da'?'kfa':'kfr')+'</div>';
+  html += '<div class="kc">'+statusDot(coDot)+'<div class="knum">KPI 3</div><div class="klbl">Concierge Program</div><div class="kval">'+concQ.length+'</div><div class="ksub">of 7&ndash;12 target &middot; '+money(concSpent)+' of $5K</div>'+kbar(Math.min(concQ.length,12),12,coDot==='dg'?'kfg':coDot==='da'?'kfa':'kfr')+'</div>';
+  html += '<div class="kc">'+statusDot(cfDot)+'<div class="knum">KPI 4</div><div class="klbl">Contracts &amp; Folders</div><div class="kval" style="font-size:18px">'+cxDone+'/'+N+' &#x2022; '+flDone+'/'+N+'</div><div class="ksub">contracts &middot; folders</div>'+kbar(cxDone+flDone,N*2,cfDot==='dg'?'kfg':cfDot==='da'?'kfa':'kfr')+'</div>';
+  html += '</div></div>';
+
+  // Jackie
+  html += '<div class="pc" style="margin-bottom:22px"><div class="ph">'
+    + '<div><div class="pname">Jackie</div><div class="prole">Part-Time Admin &middot; Contracts &amp; Folder Migration Lead</div></div>'
+    + '<div class="pbonus"><span>'+S.q+' Progress</span>'
+    + '<span class="pbval" style="color:'+(cxDone===N&&flDone===N?'var(--greend)':'var(--amber)')+'">'+( cxDone===N&&flDone===N?'Complete &#x2713;':'In Progress')+'</span>'
+    + '</div></div>'
+    + '<div class="kg kg2">';
+  html += '<div class="kc">'+statusDot(cxDone===N?'dg':cxDone>0?'da':'dr')+'<div class="knum">Task 1</div><div class="klbl">Signed Contracts</div><div class="kval">'+cxDone+'/'+N+'</div><div class="ksub">'+(N-cxDone)+' outstanding</div>'+kbar(cxDone,N,cxDone===N?'kfg':cxDone>0?'kfa':'kfr')+'</div>';
+  html += '<div class="kc">'+statusDot(flDone===N?'dg':flDone>0?'da':'dr')+'<div class="knum">Task 2</div><div class="klbl">Folder Migration</div><div class="kval">'+flDone+'/'+N+'</div><div class="ksub">'+(N-flDone)+' remaining</div>'+kbar(flDone,N,flDone===N?'kfg':flDone>0?'kfa':'kfr')+'</div>';
+  html += '</div></div>';
+
+  // ══ SECTION 4: SATISFACTION ══
+  html += renderSatChart(S.mo);
+
+  return html;
+}
+
+
+/* ─── RETENTION (monthly) ─── */
+function renderRet() {
+  var N=CLIENTS.length, months=QM[S.q], mn=months[S.mo];
+  var retained=CLIENTS.filter(function(c){return getRet(c.id,S.mo).active;}).length;
+  var lost=CLIENTS.filter(function(c){return !getRet(c.id,S.mo).active;});
+  var risk=CLIENTS.filter(function(c){return getRet(c.id,S.mo).sat==='At Risk';});
+  var html = '<div class="sh"><div><div class="st">Retention &mdash; '+mn+' only</div>';
+  html += '<div class="su">Data below is for <strong>'+mn+'</strong> specifically. Use the month pills above to switch months. Each month is tracked independently.</div></div>';
+  html += badge(retained+'/'+N+' Active', retained===N?'bgg':'bgr')+'</div>';
+  if (lost.length>0) html += alertBox(warnIcon()+' <strong>Gatekeeper triggered:</strong> '+lost.map(function(c){return c.n;}).join(', ')+' &mdash; Escalate to Cokie.', 'alr');
+  if (risk.length>0) html += alertBox(warnIcon()+' At Risk in '+mn+': '+risk.map(function(c){return c.n;}).join(', ')+' &mdash; Proactive outreach needed.', 'ala');
+  if (retained===N&&risk.length===0) html += alertBox(checkIcon()+' All '+N+' Top 30 clients active with no at-risk flags for '+mn+'.', 'alg');
+  // Month summary bar
+  html += '<div class="sg sg3" style="margin-bottom:18px">';
+  months.forEach(function(monthN, i) {
+    var rr=CLIENTS.filter(function(c){return getRet(c.id,i).active;}).length;
+    var ar=CLIENTS.filter(function(c){return getRet(c.id,i).sat==='At Risk';}).length;
+    var th=CLIENTS.filter(function(c){return getRet(c.id,i).sat==='Thriving';}).length;
+    var isCur = i===S.mo;
+    html += '<div class="sc '+(rr===N?'scg':'scr')+'" style="'+(isCur?'box-shadow:0 0 0 2px var(--navy);':'')+'" onclick="setMonth('+i+')" style="cursor:pointer">';
+    html += '<div class="sl">'+monthN+(isCur?' &larr; current':'')+'</div>';
+    html += '<div class="sv" style="font-size:24px">'+rr+'/'+N+'</div>';
+    html += '<div class="ss">Thriving: '+th+' &middot; At Risk: '+ar+'</div></div>';
+  });
+  html += '</div>';
+  // Current month client table
+  html += '<div class="card"><div class="ch"><div class="ct">'+mn+' Client Status &mdash; Top 30</div></div>';
+  html += '<div class="ts"><table><thead><tr><th>#</th><th>Client</th><th>Active in '+mn+'</th><th>Satisfaction</th><th>Notes</th></tr></thead><tbody>';
+  CLIENTS.forEach(function(c, idx) {
+    var e=getRet(c.id,S.mo);
+    var satColor = e.sat ? SAT_COLORS[e.sat]||'var(--txtm)' : 'var(--txtl)';
+    html += '<tr><td style="font-family:var(--mono);font-size:11px;color:var(--txtl)">'+String(idx+1).padStart(2,'0')+'</td>';
+    html += '<td style="font-weight:600">'+c.n+'</td>';
+    html += '<td><input type="checkbox" '+(e.active?'checked':'')+' onchange="setRet(\''+c.id+'\','+S.mo+',\'active\',this.checked);render()"></td>';
+    html += '<td><select onchange="setRet(\''+c.id+'\','+S.mo+',\'sat\',this.value)" style="width:130px">';
+    SAT_OPTS.forEach(function(o){ html += '<option value="'+o+'"'+(e.sat===o?' selected':'')+'>'+(o||'Select...')+'</option>'; });
+    html += '</select></td>';
+    html += '<td><input type="text" value="'+(e.note||'').replace(/"/g,'&quot;')+'" placeholder="Notes..." onblur="setRet(\''+c.id+'\','+S.mo+',\'note\',this.value)" style="width:200px"></td></tr>';
+  });
+  html += '</tbody></table></div></div>';
+  html += renderSatChart(S.mo);
+  return html;
+}
+
+/* ─── TOUCH LOG ─── */
+function renderTouches() {
+  var N=CLIENTS.length, months=QM[S.q], mn=months[S.mo], mk0=monthKey(S.mo);
+  var touchSet={}; S.touches.filter(function(t){return t.mo===mk0;}).forEach(function(t){touchSet[t.cid]=true;});
+  var tc=Object.keys(touchSet).length, tw=pct(tc,N);
+  var tpClass=function(tp){return tp==='Call'?'tpc':tp==='Meeting'?'tpm':tp==='Email'?'tpe':tp==='Personal Outreach'?'tpp':tp==='Gift'?'tpg':'tpv';};
+  var html='<div class="sh"><div><div class="st">Monthly Touch Log &mdash; '+mn+'</div><div class="su">Every Top 30 client must receive a personal, meaningful touch every month. Logged in Redtail within 48 hrs. (Kenson KPI #2)</div></div>'+badge(tc+'/'+N+' Touched', tc===N?'bgg':tc>=20?'bga':'bgr')+'</div>';
+  html += '<div class="card" style="padding:14px 20px;margin-bottom:14px"><div class="pr"><div class="prl" style="width:190px">'+mn+' Progress</div><div class="prb" style="height:8px"><div class="prf'+(tw<50?' re':tw<100?' am':'')+'" style="width:'+tw+'%"></div></div><div class="prc">'+tc+'/'+N+'</div></div></div>';
+  html += '<div class="card" style="padding:12px"><div style="font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtl);margin-bottom:10px">Click client to log a touch for '+mn+' &middot; Green = touched this month</div>';
+  CLIENTS.forEach(function(c) {
+    var cTouches=S.touches.filter(function(t){return t.cid===c.id&&t.mo===mk0;}), hit=cTouches.length>0;
+    html += '<div class="cr"><div class="crh'+(hit?' hit':'')+'" onclick="toggleRow(\''+c.id+'\')"><span class="'+(hit?'dg':'dy')+'" style="width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0"></span><span style="font-weight:600;flex:1;font-size:13px">'+c.n+'</span>';
+    if (cTouches.length>0) html += '<span style="font-size:11px;color:var(--txtm);font-family:var(--mono);margin-right:8px">'+cTouches.length+' touch'+(cTouches.length>1?'es':'')+'</span>';
+    html += '<span id="arr_'+c.id+'" style="font-size:11px;color:var(--txtl)">&#x25BC;</span></div>';
+    html += '<div class="crb" id="crb_'+c.id+'">';
+    if (cTouches.length>0) {
+      html += '<div style="margin-bottom:10px">';
+      cTouches.forEach(function(t){ html += '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bdrl)"><span class="tp '+tpClass(t.tp)+'">'+t.tp+'</span><span style="font-family:var(--mono);font-size:11px;color:var(--txtm)">'+t.dt+'</span><span style="flex:1;font-size:12px">'+(t.nt||'')+'</span><button class="btn bd xs" onclick="deleteTouch(\''+t.id+'\')">remove</button></div>'; });
+      html += '</div>';
+    }
+    html += '<div style="display:grid;grid-template-columns:130px 130px 1fr auto;gap:8px;align-items:end">';
+    html += '<div class="fgrp"><label>Date</label><input type="date" id="td_'+c.id+'" value="'+today()+'"></div>';
+    html += '<div class="fgrp"><label>Type</label><select id="tt_'+c.id+'">'+TOUCH_TYPES.map(function(t){return '<option>'+t+'</option>';}).join('')+'</select></div>';
+    html += '<div class="fgrp"><label>Notes</label><input type="text" id="tn_'+c.id+'" placeholder="What was discussed..."></div>';
+    html += '<button class="btn bgn" style="height:34px" onclick="addTouch(\''+c.id+'\',\''+mk0+'\')">Log</button></div></div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+function toggleRow(cid){var b=document.getElementById('crb_'+cid),a=document.getElementById('arr_'+cid),o=b.style.display==='block';b.style.display=o?'none':'block';a.innerHTML=o?'&#x25BC;':'&#x25B2;';}
+function addTouch(cid,mk0){var dt=document.getElementById('td_'+cid).value,tp=document.getElementById('tt_'+cid).value,nt=document.getElementById('tn_'+cid).value;if(!dt)return;S.touches.push({id:uid(),cid:cid,mo:mk0,dt:dt,tp:tp,nt:nt});saveState();render();}
+function deleteTouch(id){S.touches=S.touches.filter(function(t){return t.id!==id;});saveState();render();}
+
+/* ─── GROWTH ─── */
+function renderGrowth() {
+  var q=S.q, refs=S.gr.refs.filter(function(r){return r.q===q;}), exps=S.gr.exp.filter(function(e){return e.q===q;}), opps=S.gr.opp.filter(function(o){return o.q===q;});
+  var html='<div class="sh"><div><div class="st">Growth Pipeline &mdash; '+q+' '+S.yr+'</div><div class="su">Kenson KPI #4 &mdash; Tracked quarterly.</div></div></div>';
+  html += '<div class="sg sg3" style="margin-bottom:22px"><div class="sc '+(refs.length>=2?'scg':'sca')+'"><div class="sl">Referrals</div><div class="sv">'+refs.length+'/2</div><div class="ss">Target: 2 per quarter</div></div><div class="sc '+(exps.length>=1?'scg':'sca')+'"><div class="sl">Expansions</div><div class="sv">'+exps.length+'/1</div><div class="ss">New assets added</div></div><div class="sc '+(opps.length>=3?'scg':'sca')+'"><div class="sl">Opportunities</div><div class="sv">'+opps.length+'/3</div><div class="ss">Networking &amp; events</div></div></div>';
+  html += '<div class="card"><div class="ch"><div class="ct">Referrals '+badge(refs.length+'/2',refs.length>=2?'bgg':'bga')+'</div><button class="btn bo sm" onclick="tog(\'rf\')">+ Add</button></div>';
+  html += '<div class="fp" id="rf"><div class="fgr c2"><div class="fgrp"><label>Lead Name</label><input type="text" id="rn"></div><div class="fgrp"><label>Date</label><input type="date" id="rd" value="'+today()+'"></div><div class="fgrp"><label>Referred By</label><input type="text" id="rb"></div><div class="fgrp"><label>Status</label><select id="rs">'+REF_STATS.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div></div><div class="fgrp"><label>Notes</label><input type="text" id="rnt"></div><div class="fa"><button class="btn bgh" onclick="tog(\'rf\')">Cancel</button><button class="btn bn" onclick="addRef()">Save</button></div></div>';
+  if (refs.length===0) html += '<div style="text-align:center;padding:24px;color:var(--txtm)">No referrals yet for '+q+'.</div>';
+  else { html += '<div class="ts"><table><thead><tr><th>Name</th><th>Date</th><th>Referred By</th><th>Status</th><th></th></tr></thead><tbody>'; refs.forEach(function(r){ html += '<tr><td style="font-weight:600">'+r.n+'</td><td style="font-family:var(--mono);font-size:11px">'+r.dt+'</td><td>'+(r.rb||'&mdash;')+'</td><td><select onchange="updateRef(\''+r.id+'\',this.value)" style="width:128px">'+REF_STATS.map(function(s){return '<option'+(r.st===s?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td><td><button class="btn bd xs" onclick="delGr(\'refs\',\''+r.id+'\')">&#x2715;</button></td></tr>'; }); html += '</tbody></table></div>'; }
+  html += '</div>';
+  html += '<div class="card"><div class="ch"><div class="ct">Expansions '+badge(exps.length+'/1',exps.length>=1?'bgg':'bga')+'</div><button class="btn bo sm" onclick="tog(\'ex\')">+ Add</button></div>';
+  html += '<div class="fp" id="ex"><div class="fgr c2"><div class="fgrp"><label>Client</label><select id="ec"><option value="">Select</option>'+CLIENTS.map(function(c){return '<option value="'+c.n+'">'+c.n+'</option>';}).join('')+'</select></div><div class="fgrp"><label>Date</label><input type="date" id="ed" value="'+today()+'"></div><div class="fgrp"><label>New Assets ($)</label><input type="number" id="ea"></div><div class="fgrp"><label>Notes</label><input type="text" id="en"></div></div><div class="fa"><button class="btn bgh" onclick="tog(\'ex\')">Cancel</button><button class="btn bn" onclick="addExp()">Save</button></div></div>';
+  if (exps.length===0) html += '<div style="text-align:center;padding:24px;color:var(--txtm)">No expansions yet.</div>';
+  else { html += '<table><thead><tr><th>Client</th><th>Date</th><th>Amount</th><th>Notes</th><th></th></tr></thead><tbody>'; exps.forEach(function(e){ html += '<tr><td style="font-weight:600">'+e.cl+'</td><td style="font-family:var(--mono);font-size:11px">'+e.dt+'</td><td style="color:var(--green);font-weight:700">'+money(e.am)+'</td><td style="font-size:12px">'+(e.nt||'')+'</td><td><button class="btn bd xs" onclick="delGr(\'exp\',\''+e.id+'\')">&#x2715;</button></td></tr>'; }); html += '</tbody></table>'; }
+  html += '</div>';
+  html += '<div class="card"><div class="ch"><div class="ct">Opportunities '+badge(opps.length+'/3',opps.length>=3?'bgg':'bga')+'</div><button class="btn bo sm" onclick="tog(\'op\')">+ Add</button></div>';
+  html += '<div class="fp" id="op"><div class="fgr c3"><div class="fgrp"><label>Source / Event</label><input type="text" id="os"></div><div class="fgrp"><label>Contact</label><input type="text" id="oc"></div><div class="fgrp"><label>Date</label><input type="date" id="od" value="'+today()+'"></div></div><div class="fgrp"><label>Notes / Next Step</label><input type="text" id="on"></div><div class="fa"><button class="btn bgh" onclick="tog(\'op\')">Cancel</button><button class="btn bn" onclick="addOpp()">Save</button></div></div>';
+  if (opps.length===0) html += '<div style="text-align:center;padding:24px;color:var(--txtm)">No opportunities yet.</div>';
+  else { html += '<table><thead><tr><th>Source</th><th>Contact</th><th>Date</th><th>Notes</th><th></th></tr></thead><tbody>'; opps.forEach(function(o){ html += '<tr><td style="font-weight:600">'+o.src+'</td><td>'+(o.ct||'&mdash;')+'</td><td style="font-family:var(--mono);font-size:11px">'+o.dt+'</td><td style="font-size:12px">'+(o.nt||'')+'</td><td><button class="btn bd xs" onclick="delGr(\'opp\',\''+o.id+'\')">&#x2715;</button></td></tr>'; }); html += '</tbody></table>'; }
+  html += '</div>';
+  return html;
+}
+function addRef(){var n=document.getElementById('rn').value.trim(),dt=document.getElementById('rd').value,rb=document.getElementById('rb').value.trim(),st=document.getElementById('rs').value,nt=document.getElementById('rnt').value;if(!n||!dt)return;S.gr.refs.push({id:uid(),q:S.q,n:n,dt:dt,rb:rb,st:st,nt:nt});saveState();render();}
+function updateRef(id,st){var r=S.gr.refs.find(function(r){return r.id===id;});if(r){r.st=st;saveState();}}
+function addExp(){var cl=document.getElementById('ec').value,dt=document.getElementById('ed').value,am=parseFloat(document.getElementById('ea').value)||0,nt=document.getElementById('en').value;if(!cl||!dt)return;S.gr.exp.push({id:uid(),q:S.q,cl:cl,dt:dt,am:am,nt:nt});saveState();render();}
+function addOpp(){var src=document.getElementById('os').value.trim(),ct=document.getElementById('oc').value.trim(),dt=document.getElementById('od').value,nt=document.getElementById('on').value;if(!src||!dt)return;S.gr.opp.push({id:uid(),q:S.q,src:src,ct:ct,dt:dt,nt:nt});saveState();render();}
+function delGr(type,id){S.gr[type]=S.gr[type].filter(function(i){return i.id!==id;});saveState();render();}
+
+/* ─── CALENDAR & EMAIL ─── */
+function renderCalendar() {
+  var yr=S.yr, moNum=getMonthNumber(), mn=QM[S.q][S.mo];
+  var daysInMo=getDaysInMonth(yr,moNum), firstDay=getFirstDayOfWeek(yr,moNum);
+  // Count completed days
+  var workDays=[], totalWork=0, emailDone=0, mtgDone=0;
+  for (var d=1; d<=daysInMo; d++) {
+    if (!isWeekend(yr,moNum,d)) {
+      totalWork++;
+      var ds=dateStr(yr,moNum,d), ck=calKey(ds);
+      var checks=S.calChecks[ck]||{mtg:false,email:false};
+      if(checks.email) emailDone++;
+      if(checks.mtg) mtgDone++;
+      workDays.push({d:d,ds:ds,checks:checks});
+    }
+  }
+  var html='<div class="sh"><div><div class="st">Calendar &amp; Email &mdash; '+mn+' '+S.yr+'</div>';
+  html += '<div class="su">Track daily email review and meeting requests for every working day. Catherine KPI #2.</div></div></div>';
+  // Summary
+  html += '<div class="sg sg3" style="margin-bottom:18px">';
+  html += '<div class="sc '+(emailDone===totalWork?'scg':emailDone>0?'sca':'scr')+'"><div class="sl">Email Days Complete</div><div class="sv">'+emailDone+'/'+totalWork+'</div><div class="ss">Cokie\'s email reviewed &amp; completed</div></div>';
+  html += '<div class="sc '+(mtgDone===totalWork?'scg':mtgDone>0?'sca':'scr')+'"><div class="sl">Meeting Request Days</div><div class="sv">'+mtgDone+'/'+totalWork+'</div><div class="ss">Meeting requests sent/handled</div></div>';
+  html += '<div class="sc"><div class="sl">Working Days in '+mn+'</div><div class="sv">'+totalWork+'</div><div class="ss">Mon &ndash; Fri, excl. weekends</div></div>';
+  html += '</div>';
+  // Calendar grid
+  html += '<div class="card"><div class="cal-grid">';
+  var dows=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  dows.forEach(function(d){ html += '<div class="cal-head">'+d+'</div>'; });
+  // Empty cells before first day
+  for (var i=0; i<firstDay; i++) html += '<div class="cal-day empty"></div>';
+  for (var day=1; day<=daysInMo; day++) {
+    var weekend=isWeekend(yr,moNum,day), isT=isToday(yr,moNum,day);
+    var ds2=dateStr(yr,moNum,day), ck2=calKey(ds2);
+    var checks2=S.calChecks[ck2]||{mtg:false,email:false};
+    html += '<div class="cal-day'+(weekend?' weekend':'')+(isT?' today':'')+'"><div class="cal-day-num'+(weekend?'':' work')+'">';
+    html += '<span>'+day+'</span>';
+    if(isT) html += '<span style="font-size:9px;font-family:var(--mono);color:var(--navy);background:var(--navym);padding:1px 4px;border-radius:2px">today</span>';
+    html += '</div>';
+    if (!weekend) {
+      html += '<label class="cal-check'+(checks2.mtg?' done':'')+'">';
+      html += '<input type="checkbox" '+(checks2.mtg?'checked':'')+' onchange="setCalCheck(\''+ck2+'\',\'mtg\',this.checked)"> Mtg Req</label>';
+      html += '<label class="cal-check'+(checks2.email?' done':'')+'">';
+      html += '<input type="checkbox" '+(checks2.email?'checked':'')+' onchange="setCalCheck(\''+ck2+'\',\'email\',this.checked)"> Email &#x2713;</label>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  // Legend
+  html += '<div style="display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--bdrl);font-size:11px;color:var(--txtm)">';
+  html += '<span><strong>Mtg Req</strong> = Any Meeting Requests Sent</span>';
+  html += '<span><strong>Email &#x2713;</strong> = Cokie\'s Email Reviewed &amp; Completed</span>';
+  html += '</div></div>';
+  // Notes
+  html += '<div class="card"><div class="ch"><div class="ct">'+mn+' Calendar Notes</div></div><textarea style="width:100%;min-height:70px;padding:9px;border:1px solid var(--bdr);border-radius:5px;font-size:13px;resize:vertical;font-family:var(--sans)" onblur="S.calNotes=this.value;saveState()">'+(S.calNotes||'')+'</textarea></div>';
+  return html;
+}
+function setCalCheck(ck, field, val) {
+  if (!S.calChecks[ck]) S.calChecks[ck]={mtg:false,email:false};
+  S.calChecks[ck][field]=val; saveState();
+  // Refresh just the checkbox label without full re-render
+  var label = document.querySelector('[onchange*="'+ck+'"][onchange*="'+field+'"]');
+  if (label && label.parentElement) label.parentElement.className = 'cal-check'+(val?' done':'');
+}
+
+/* ─── CONCIERGE ─── */
+function renderExperience() {
+  var concQ=S.conc.filter(function(c){return c.q===S.q;}), sp=concQ.reduce(function(s,c){return s+(c.am||0);},0);
+  var budget=CONC_QTR_BUDGET, pp=Math.min(pct(sp,budget),100), cv={};
+  concQ.forEach(function(c){cv[c.cl]=true;}); var cvCount=Object.keys(cv).length;
+  var html='<div class="sh"><div><div class="st">Client Experience &mdash; Concierge</div><div class="su">Catherine KPI #3: 7&ndash;12 personalized touches per quarter within $5,000 budget. See Budget tab for per-client tracking.</div></div><button class="btn bn" onclick="tog(\'cf\')">+ Log Touch</button></div>';
+  html += '<div class="sg sg4" style="margin-bottom:14px"><div class="sc '+(concQ.length>=7&&concQ.length<=12?'scg':concQ.length<7?'sca':'scr')+'"><div class="sl">Touches</div><div class="sv">'+concQ.length+'</div><div class="ss">Target: 7&ndash;12 / qtr</div></div><div class="sc '+(sp<=budget?'scg':'scr')+'"><div class="sl">Budget Used</div><div class="sv">'+money(sp)+'</div><div class="ss">of '+money(budget)+' / qtr &middot; Top 30</div></div><div class="sc"><div class="sl">Remaining</div><div class="sv" style="color:'+(budget-sp>=0?'var(--green)':'var(--red)')+'">'+money(Math.max(0,budget-sp))+'</div><div class="ss">this quarter</div></div><div class="sc"><div class="sl">Clients Touched</div><div class="sv">'+cvCount+'</div><div class="ss">of '+CLIENTS.length+' Top 30</div></div></div>';
+  html += '<div class="card" style="padding:12px 20px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><span style="font-size:12px;font-weight:500;color:var(--navy)">Quarterly Budget</span><span style="font-family:var(--mono);font-size:11px;color:var(--txtm)">'+money(sp)+' / $5,000</span></div><div class="prb" style="height:8px"><div class="prf'+(pp>100?' re':pp>80?' am':'')+'" style="width:'+pp+'%"></div></div></div>';
+  html += '<div class="fp" id="cf"><div class="fgr c3"><div class="fgrp"><label>Client</label><select id="cc"><option value="">Select</option>'+CLIENTS.map(function(c){return '<option value="'+c.n+'">'+c.n+'</option>';}).join('')+'</select></div><div class="fgrp"><label>Touch Type</label><select id="ctp">'+CONC_TYPES.map(function(t){return '<option>'+t+'</option>';}).join('')+'</select></div><div class="fgrp"><label>Date</label><input type="date" id="cdt" value="'+today()+'"></div><div class="fgrp"><label>Amount ($)</label><input type="number" id="cam"></div><div class="fgrp" style="grid-column:span 2"><label>Description</label><input type="text" id="cnt"></div></div><div class="fa"><button class="btn bgh" onclick="tog(\'cf\')">Cancel</button><button class="btn bn" onclick="addConc()">Save</button></div></div>';
+  html += '<div class="card">'+(concQ.length===0?'<div style="text-align:center;padding:28px;color:var(--txtm)">No concierge touches logged for '+S.q+' yet.</div>':'<div class="ts"><table><thead><tr><th>Client</th><th>Type</th><th>Date</th><th>Amount</th><th>Description</th><th></th></tr></thead><tbody>'+concQ.slice().sort(function(a,b){return b.dt.localeCompare(a.dt);}).map(function(t){return '<tr><td style="font-weight:600">'+t.cl+'</td><td>'+badge(t.tp,'bgna')+'</td><td style="font-family:var(--mono);font-size:11px">'+t.dt+'</td><td style="color:var(--green);font-weight:600">'+(t.am?money(t.am):'&mdash;')+'</td><td style="font-size:12px">'+(t.nt||'')+'</td><td><button class="btn bd xs" onclick="deleteConc(\''+t.id+'\')">&#x2715;</button></td></tr>';}).join('')+'</tbody></table></div>')+'</div>';
+  html += '<div class="card"><div class="ct" style="margin-bottom:10px">Top 30 Coverage This Quarter</div><div style="display:flex;flex-wrap:wrap">'+CLIENTS.map(function(c){var h=cv[c.n];return '<span class="cp" style="background:'+(h?'var(--greenl)':'var(--bg)')+';color:'+(h?'#1a5c10':'var(--txtm)')+';border:1px solid '+(h?'#b8e3b0':'var(--bdr)')+';">'+(h?'&#x2713; ':' ')+c.n.split(',')[0]+'</span>';}).join('')+'</div></div>';
+  return html;
+}
+function addConc(){var cl=document.getElementById('cc').value,tp=document.getElementById('ctp').value,dt=document.getElementById('cdt').value,am=parseFloat(document.getElementById('cam').value)||0,nt=document.getElementById('cnt').value;if(!cl||!dt)return;S.conc.push({id:uid(),q:S.q,cl:cl,tp:tp,dt:dt,am:am,nt:nt});saveState();render();}
+function deleteConc(id){S.conc=S.conc.filter(function(c){return c.id!==id;});saveState();render();}
+
+/* ─── BUDGET ─── */
+function renderBudget() {
+  // Aggregate all-year spending per client from conc
+  var clientSpend={};
+  CLIENTS.forEach(function(c){clientSpend[c.n]=0;});
+  S.conc.forEach(function(t){if(clientSpend[t.cl]!==undefined)clientSpend[t.cl]+=(t.am||0);else clientSpend[t.cl]=(t.am||0);});
+  var totalSpent=S.conc.reduce(function(s,t){return s+(t.am||0);},0);
+  // Monthly: budget is $1750 monthly, $5250 quarterly, $21000 annual
+  var qBudget=MONTHLY_BUDGET*3;
+  var currentQspend=S.conc.filter(function(c){return c.q===S.q;}).reduce(function(s,t){return s+(t.am||0);},0);
+  var html='<div class="sh"><div><div class="st">Budget Management &mdash; 2026</div>';
+  html += '<div class="su">Annual budget: '+money(ANNUAL_BUDGET)+' &middot; Monthly: '+money(MONTHLY_BUDGET)+' &middot; Per client: '+money(PER_CLIENT_ANNUAL)+'/year &middot; 30 clients</div></div></div>';
+  // Overview
+  html += '<div class="sg sg4" style="margin-bottom:18px">';
+  html += '<div class="sc scn"><div class="sl">Annual Budget</div><div class="sv">'+money(ANNUAL_BUDGET)+'</div><div class="ss">$1,750 &times; 12 months</div></div>';
+  html += '<div class="sc"><div class="sl">Monthly Budget</div><div class="sv">'+money(MONTHLY_BUDGET)+'</div><div class="ss">~$583/client/qtr</div></div>';
+  html += '<div class="sc '+(totalSpent<=ANNUAL_BUDGET?'scg':'scr')+'"><div class="sl">Total YTD Spent</div><div class="sv">'+money(totalSpent)+'</div><div class="ss">'+money(ANNUAL_BUDGET-totalSpent)+' remaining annual</div></div>';
+  html += '<div class="sc"><div class="sl">Per Client / Year</div><div class="sv">'+money(PER_CLIENT_ANNUAL)+'</div><div class="ss">Approximate value allocation</div></div>';
+  html += '</div>';
+  // Current quarter
+  html += '<div class="card" style="margin-bottom:14px"><div class="ch"><div class="ct">'+S.q+' '+S.yr+' &mdash; Quarterly View</div><span style="font-size:12px;color:var(--txtm)">Budget: '+money(qBudget)+'</span></div>';
+  var qPct=Math.min(pct(currentQspend,qBudget),100);
+  html += '<div class="pr"><div class="prl">'+S.q+' Spent</div><div class="prb" style="height:8px"><div class="prf'+(qPct>100?' re':qPct>80?' am':'')+'" style="width:'+qPct+'%"></div></div><div class="prc">'+money(currentQspend)+'</div></div>';
+  html += '<div style="font-size:11px;color:var(--txtm);margin-top:4px">'+money(qBudget-currentQspend)+' remaining for '+S.q+'</div>';
+  html += '</div>';
+  // All 4 quarters
+  html += '<div class="card" style="margin-bottom:14px"><div class="ch"><div class="ct">Quarterly Breakdown &mdash; 2026</div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">';
+  QS.forEach(function(q) {
+    var qSp=S.conc.filter(function(c){return c.q===q;}).reduce(function(s,t){return s+(t.am||0);},0);
+    var qP=Math.min(pct(qSp,qBudget),100);
+    html += '<div style="border:1px solid var(--bdr);border-radius:6px;padding:12px"><div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtm);margin-bottom:6px">'+q+(q===S.q?' &larr;':'')+'</div>';
+    html += '<div style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--navy)">'+money(qSp)+'</div>';
+    html += '<div style="font-size:11px;color:var(--txtm);margin-bottom:6px">of '+money(qBudget)+'</div>';
+    html += '<div class="bud-bar"><div class="bud-fill" style="width:'+qP+'%;background:'+(qP>100?'var(--red)':qP>80?'var(--amber)':'var(--green)')+'"></div></div></div>';
+  });
+  html += '</div></div>';
+  // Per-client budget tracking
+  html += '<div class="card"><div class="ch"><div class="ct">Per-Client Budget Tracking</div><span style="font-size:11px;color:var(--txtm);font-family:var(--mono)">Annual allocation: '+money(PER_CLIENT_ANNUAL)+' per client</span></div>';
+  html += '<div class="ts"><table><thead><tr><th>#</th><th>Client</th><th>YTD Spent</th><th>Annual Budget</th><th>Remaining</th><th>Usage</th></tr></thead><tbody>';
+  var sorted=CLIENTS.slice().sort(function(a,b){return (clientSpend[b.n]||0)-(clientSpend[a.n]||0);});
+  sorted.forEach(function(c,idx){
+    var spent=clientSpend[c.n]||0, rem=PER_CLIENT_ANNUAL-spent, wp=Math.min(pct(spent,PER_CLIENT_ANNUAL),100);
+    var over=spent>PER_CLIENT_ANNUAL;
+    html += '<tr><td style="font-family:var(--mono);font-size:11px;color:var(--txtl)">'+String(idx+1).padStart(2,'0')+'</td>';
+    html += '<td style="font-weight:600">'+c.n+'</td>';
+    html += '<td style="font-family:var(--mono);font-weight:600;color:'+(over?'var(--red)':spent>0?'var(--navy)':'var(--txtl)')+'">'+money(spent)+'</td>';
+    html += '<td style="font-family:var(--mono);color:var(--txtm)">'+money(PER_CLIENT_ANNUAL)+'</td>';
+    html += '<td style="font-family:var(--mono);color:'+(over?'var(--red)':'var(--green)')+'">'+money(rem)+'</td>';
+    html += '<td style="width:120px"><div class="bud-bar"><div class="bud-fill" style="width:'+wp+'%;background:'+(wp>100?'var(--red)':wp>75?'var(--amber)':'var(--green)')+'"></div></div><span style="font-size:10px;font-family:var(--mono);color:var(--txtm)">'+wp+'%</span></td></tr>';
+  });
+  html += '</tbody></table></div></div>';
+  return html;
+}
+
+
+/* ─── 2025 ANNUAL DASHBOARD ─── */
+function renderDash2025() {
+  var N = CLIENTS.length;
+  var d = S.annual2025;
+  if (!d) d = S.annual2025 = {Q1:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},Q2:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},Q3:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''},Q4:{ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''}};
+  var annualRev = ['Q1','Q2','Q3','Q4'].reduce(function(s,q){ return s+(parseFloat(d[q].rev)||0); },0);
+  var bestQ = null, bestRev = 0;
+  ['Q1','Q2','Q3','Q4'].forEach(function(q){ if((parseFloat(d[q].rev)||0)>bestRev){bestRev=parseFloat(d[q].rev)||0;bestQ=q;} });
+
+  var html = '<div class="sh"><div><div class="st">2025 Annual Overview</div>';
+  html += '<div class="su">Full-year retrospective for 2025 &middot; Enter quarterly actuals below &middot; Switch to 2026 using the year toggle in the header</div></div></div>';
+
+  // Summary row
+  html += '<div class="sg sg4" style="margin-bottom:20px">';
+  html += '<div class="sc scn"><div class="sl">Annual Revenue 2025</div><div class="sv">'+(annualRev>0?money(annualRev):'&mdash;')+'</div><div class="ss">across all 4 quarters</div></div>';
+  html += '<div class="sc"><div class="sl">Target Baseline</div><div class="sv">'+money(720000)+'</div><div class="ss">$180K &times; 4 quarters</div></div>';
+  html += '<div class="sc '+(annualRev>=720000?'scg':annualRev>0?'sca':'')+'"><div class="sl">vs Baseline</div><div class="sv" style="font-size:22px">'+(annualRev>0?money(annualRev-720000):'&mdash;')+'</div><div class="ss">'+(annualRev>0?(annualRev>=720000?'Above target &#x2713;':'Below target'):'Enter revenue data')+'</div></div>';
+  html += '<div class="sc"><div class="sl">Best Quarter</div><div class="sv" style="font-size:22px">'+(bestQ||'&mdash;')+'</div><div class="ss">'+(bestRev>0?money(bestRev):'no data yet')+'</div></div>';
+  html += '</div>';
+
+  // Quarter cards
+  html += '<div class="yr-cards">';
+  ['Q1','Q2','Q3','Q4'].forEach(function(q) {
+    var qd = d[q];
+    var ret = parseFloat(qd.ret)||0;
+    var touch = parseFloat(qd.touch)||0;
+    var rev = parseFloat(qd.rev)||0;
+    var refs = parseInt(qd.refs)||0;
+    var exps = parseInt(qd.exps)||0;
+    var concN = parseInt(qd.concN)||0;
+    var concSp = parseFloat(qd.concSpent)||0;
+    var months = QM[q];
+    html += '<div class="yr-qcard">';
+    html += '<div class="yr-qcard-head"><div class="yr-qcard-title">'+q+'</div>';
+    html += '<div class="yr-qcard-sub">'+months[0].substr(0,3)+' &middot; '+months[1].substr(0,3)+' &middot; '+months[2].substr(0,3)+'</div></div>';
+    html += '<div class="yr-qcard-body">';
+
+    // Revenue
+    html += '<div class="yr-field"><label>Revenue Billed ($)</label>';
+    html += '<input type="number" value="'+(rev||'')+'" placeholder="0" onchange="save2025(\''+q+'\',\'rev\',this.value)" onblur="save2025(\''+q+'\',\'rev\',this.value)"></div>';
+    // Retention %
+    html += '<div class="yr-field"><label>Retention (% of Top 30)</label>';
+    html += '<input type="number" value="'+(ret||'')+'" placeholder="100" min="0" max="100" onchange="save2025(\''+q+'\',\'ret\',this.value)" onblur="save2025(\''+q+'\',\'ret\',this.value)"></div>';
+    // Touch coverage %
+    html += '<div class="yr-field"><label>Touch Coverage (%)</label>';
+    html += '<input type="number" value="'+(touch||'')+'" placeholder="0" min="0" max="100" onchange="save2025(\''+q+'\',\'touch\',this.value)" onblur="save2025(\''+q+'\',\'touch\',this.value)"></div>';
+
+    // Summary metrics
+    html += '<div style="border-top:1px solid var(--bdrl);margin-top:10px;padding-top:10px">';
+    // Referrals
+    html += '<div class="yr-metric"><span class="yr-metric-label">Referrals</span>';
+    html += '<span style="display:flex;align-items:center;gap:6px"><input type="number" value="'+(refs||'')+'" placeholder="0" min="0" style="width:50px;padding:4px 6px;font-size:12px;text-align:center;border:1px solid var(--bdr);border-radius:4px" onchange="save2025(\''+q+'\',\'refs\',this.value)"><span style="font-size:11px;color:var(--txtm)">/ 2 target</span></span></div>';
+    // Concierge
+    html += '<div class="yr-metric"><span class="yr-metric-label">Concierge Touches</span>';
+    html += '<span style="display:flex;align-items:center;gap:6px"><input type="number" value="'+(concN||'')+'" placeholder="0" min="0" style="width:50px;padding:4px 6px;font-size:12px;text-align:center;border:1px solid var(--bdr);border-radius:4px" onchange="save2025(\''+q+'\',\'concN\',this.value)"><span style="font-size:11px;color:var(--txtm)">/ 7-12</span></span></div>';
+    // Concierge spend
+    html += '<div class="yr-metric"><span class="yr-metric-label">Concierge Spend</span>';
+    html += '<span style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--txtm)">$</span><input type="number" value="'+(concSp||'')+'" placeholder="0" style="width:70px;padding:4px 6px;font-size:12px;border:1px solid var(--bdr);border-radius:4px" onchange="save2025(\''+q+'\',\'concSpent\',this.value)"></span></div>';
+    html += '</div>';
+
+    // Notes
+    html += '<div style="margin-top:10px"><label style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtm);display:block;margin-bottom:4px">Quarter Notes</label>';
+    html += '<textarea style="width:100%;min-height:55px;padding:6px 8px;border:1px solid var(--bdr);border-radius:5px;font-size:11px;font-family:var(--sans);resize:vertical" placeholder="Key wins, issues, context for '+q+' 2025..." onblur="save2025(\''+q+'\',\'notes\',this.value)">'+((qd.notes||'')).replace(/</g,'&lt;')+'</textarea></div>';
+
+    html += '</div></div>'; // close body + qcard
+  });
+  html += '</div>'; // close yr-cards
+
+  // KPI summary table across all quarters
+  html += '<div class="card"><div class="ch"><div class="ct" style="font-family:var(--serif);font-size:18px;font-weight:700">2025 KPI Summary</div></div>';
+  html += '<div class="ts"><table><thead><tr><th>Metric</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Annual</th></tr></thead><tbody>';
+
+  var rows = [
+    {label:'Revenue', key:'rev', fmt:function(v){return v>0?money(v):'&mdash;'}, total:true},
+    {label:'Retention %', key:'ret', fmt:function(v){return v>0?v+'%':'&mdash;'}, total:false},
+    {label:'Touch Coverage %', key:'touch', fmt:function(v){return v>0?v+'%':'&mdash;'}, total:false},
+    {label:'Referrals Generated', key:'refs', fmt:function(v){return v>0?v:'&mdash;'}, total:true},
+    {label:'Concierge Touches', key:'concN', fmt:function(v){return v>0?v:'&mdash;'}, total:true},
+    {label:'Concierge Spend', key:'concSpent', fmt:function(v){return v>0?money(v):'&mdash;'}, total:true},
+  ];
+  rows.forEach(function(r) {
+    html += '<tr><td style="font-weight:600">'+r.label+'</td>';
+    var annTotal = 0;
+    ['Q1','Q2','Q3','Q4'].forEach(function(q) {
+      var v = parseFloat(d[q][r.key])||0;
+      annTotal += v;
+      html += '<td style="font-family:var(--mono);font-size:12px">'+r.fmt(v)+'</td>';
+    });
+    html += '<td style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy)">'+(r.total?r.fmt(annTotal):'&mdash;')+'</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table></div></div>';
+  return html;
+}
+function save2025(q, field, val) {
+  if (!S.annual2025) S.annual2025 = {};
+  if (!S.annual2025[q]) S.annual2025[q] = {ret:0,touch:0,rev:0,refs:0,exps:0,concN:0,concSpent:0,notes:''};
+  S.annual2025[q][field] = (field==='notes') ? val : (parseFloat(val)||0);
+  saveState();
+}
+
+/* ─── CONTRACTS (Notion Link) ─── */
+function renderContracts() {
+  var N = CLIENTS.length;
+  var cxDone = 0, flDone = 0;
+  CLIENTS.forEach(function(c){ var e=S.cx[c.id]||{st:'Not Started',fl:false,nt:''}; if(e.st==='Done')cxDone++; if(e.fl)flDone++; });
+  var missing = CLIENTS.filter(function(c){return (S.cx[c.id]||{st:'Not Started'}).st!=='Done';}).map(function(c){return c.n.split(',')[0];});
+
+  var html = '<div class="sh"><div><div class="st">Contracts &amp; Folder Migration</div>';
+  html += '<div class="su">Managed in the Notion workspace. This tracker reflects current status. Open Notion to edit client records directly.</div></div>';
+  html += '<a href="https://www.notion.so" target="_blank" class="btn bn" style="text-decoration:none;gap:6px"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9"/><polyline points="9,1 13,1 13,5"/><line x1="7" y1="7" x2="13" y2="1"/></svg>Open in Notion</a></div>';
+
+  // Progress overview
+  html += '<div class="sg sg2" style="margin-bottom:18px">';
+  html += '<div class="card" style="margin-bottom:0"><div class="sl">Contracts Received</div><div class="pr" style="margin:10px 0 3px"><div class="prb" style="flex:1;height:8px"><div class="prf'+(pct(cxDone,N)<100?' am':'')+'" style="width:'+pct(cxDone,N)+'%"></div></div><div class="prc">'+cxDone+'/'+N+'</div></div><div style="font-size:11px;color:var(--txtm)">'+(N-cxDone)+' outstanding &middot; Update status in the table below or via Notion</div></div>';
+  html += '<div class="card" style="margin-bottom:0"><div class="sl">Folders Migrated (SharePoint &rarr; Redtail)</div><div class="pr" style="margin:10px 0 3px"><div class="prb" style="flex:1;height:8px"><div class="prf'+(pct(flDone,N)<100?' am':'')+'" style="width:'+pct(flDone,N)+'%"></div></div><div class="prc">'+flDone+'/'+N+'</div></div></div>';
+  html += '</div>';
+
+  if (cxDone < N) html += alertBox(infoIcon()+' '+missing.length+' contracts outstanding: '+missing.join(', '), 'ala');
+  else html += alertBox(checkIcon()+' All '+N+' contracts received.', 'alg');
+
+  html += '<div class="card"><div class="ch"><div class="ct">Contract Status &mdash; Top 30</div><div style="font-size:11px;color:var(--txtm);font-family:var(--mono)">Updates here sync to your Netlify data store</div></div>';
+  html += '<div class="ts"><table><thead><tr><th>#</th><th>Client</th><th>Contract</th><th>Folders</th><th>Notes</th></tr></thead><tbody>';
+  CLIENTS.forEach(function(c,idx){
+    var e=S.cx[c.id]||{st:'Not Started',fl:false,nt:''};
+    var isDone = e.st==='Done';
+    html += '<tr style="background:'+(isDone?'var(--greenl)':'')+'"><td style="font-family:var(--mono);font-size:11px;color:var(--txtl)">'+String(idx+1).padStart(2,'0')+'</td>';
+    html += '<td style="font-weight:600;color:'+(isDone?'var(--greend)':'')+'">'+c.n+'</td>';
+    html += '<td><select onchange="updateCx(\'"+c.id+"\',\'st\',this.value)" style="width:140px"><option value="Not Received"'+(e.st==='Not Received'||e.st==='Not Started'||e.st==='Not started'?' selected':'')+'>Not Received</option><option value="In Progress"'+(e.st==='In Progress'?' selected':'')+'>In Progress</option><option value="Done"'+(e.st==='Done'?' selected':'')+'>Received &#x2713;</option></select></td>';
+    html += '<td style="display:flex;align-items:center;gap:8px;padding:9px 13px"><input type="checkbox"'+(e.fl?' checked':'')+' onchange="updateCx(\'"+c.id+"\',\'fl\',this.checked)"><span style="font-size:12px;color:'+(e.fl?'var(--green)':'var(--txtm)')+';">'+(e.fl?'Migrated':'Pending')+'</span></td>';
+    html += '<td><input type="text" value="'+(e.nt||'').replace(/"/g,'&quot;')+'" placeholder="Notes..." onblur="updateCx(\'"+c.id+"\',\'nt\',this.value)" style="width:180px"></td></tr>';
+  });
+  html += '</tbody></table></div></div>';
+  return html;
+}
+
+
+function updateCx(id,f,v){if(!S.cx[id])S.cx[id]={st:'Not Started',fl:false,nt:''};S.cx[id][f]=v;saveState();if(f!=='nt')render();}
+
+/* ─── MILESTONES ─── */
+function renderMilestones() {
+  var allMs = S.ms.filter(function(m){ return m.q === S.q; });
+  var done = allMs.filter(function(m){return m.st==='Done';}).length;
+  var blocked = allMs.filter(function(m){return m.st==='Blocked';}).length;
+  var ip = allMs.filter(function(m){return m.st==='In Progress';}).length;
+  function dotCls(s){return s==='Done'?'dg':s==='Blocked'?'dr':s==='In Progress'?'db':'dy';}
+  function bdrCol(s){return s==='Done'?'var(--green)':s==='Blocked'?'var(--red)':s==='In Progress'?'#3b82f6':'var(--bdr)';}
+  var html = '<div class="sh"><div><div class="st">Key Milestones \u2014 '+S.q+' '+S.yr+'</div>';
+  html += '<div class="su">Quarterly milestones reviewed every Monday. Flag blockers to Heidi immediately.</div></div>';
+  html += '<button class="btn bn" onclick="tog(\'msf\')">+ Add Milestone</button></div>';
+  if (allMs.length > 0) {
+    html += '<div class="sg sg3" style="margin-bottom:18px">';
+    html += '<div class="sc '+(done===allMs.length&&allMs.length>0?'scg':done>0?'sca':'')+'">'
+      +'<div class="sl">Complete</div><div class="sv">'+done+'/'+allMs.length+'</div></div>';
+    html += '<div class="sc '+(blocked>0?'scr':'')+'">'
+      +'<div class="sl">Blocked</div><div class="sv" style="color:'+(blocked>0?'var(--red)':'var(--navy)')+'">'+blocked+'</div></div>';
+    html += '<div class="sc"><div class="sl">In Progress</div><div class="sv">'+ip+'</div></div>';
+    html += '</div>';
+  }
+  html += '<div class="fp" id="msf"><div class="fgr c3">';
+  html += '<div class="fgrp" style="grid-column:span 2"><label>Milestone</label>'
+    +'<input type="text" id="msti" placeholder="What needs to happen this quarter?"></div>';
+  html += '<div class="fgrp"><label>Due Date</label><input type="date" id="msdd"></div>';
+  html += '<div class="fgrp"><label>Owner</label><select id="msow">'
+    +OWNERS.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select></div>';
+  html += '<div class="fgrp"><label>Status</label><select id="msst">'
+    +MS_STATS.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>';
+  html += '</div><div class="fa">'
+    +'<button class="btn bgh" onclick="tog(\'msf\')">Cancel</button>'
+    +'<button class="btn bn" onclick="addMs()">Save</button></div></div>';
+  if (allMs.length === 0) {
+    html += '<div class="card" style="text-align:center;padding:40px;color:var(--txtm)">No milestones for '+S.q+' yet. Click \u201c+ Add Milestone\u201d to get started.</div>';
+  } else {
+    allMs.slice().sort(function(a,b){return (a.dd||'').localeCompare(b.dd||'');}).forEach(function(m){
+      html += '<div class="mi" style="border-left-color:'+bdrCol(m.st)+'"><span class="'+dotCls(m.st)+'" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block"></span>';
+      html += '<span class="mt">'+m.ti+'</span>';
+      html += '<span class="mot">'+m.ow+'</span>';
+      if (m.dd) html += '<span class="mdt">'+m.dd+'</span>';
+      html += '<select onchange="updateMs(\''+m.id+'\',this.value)" style="width:120px">'
+        +MS_STATS.map(function(s){return '<option'+(m.st===s?' selected':'')+'>'+s+'</option>';}).join('')+'</select>';
+      html += '<button class="btn bd xs" onclick="deleteMs(\''+m.id+'\')">&#x2715;</button></div>';
+    });
+  }
+  return html;
+}
+function addMs() {
+  var ti = document.getElementById('msti').value.trim();
+  if (!ti) return;
+  var dd = document.getElementById('msdd').value;
+  var ow = document.getElementById('msow').value;
+  var st = document.getElementById('msst').value;
+  S.ms.push({id:uid(), q:S.q, ti:ti, dd:dd, ow:ow, st:st});
+  saveState(); render();
+}
+function updateMs(id, st) { var m=S.ms.find(function(m){return m.id===id;}); if(m){m.st=st;saveState();} }
+function deleteMs(id) { S.ms=S.ms.filter(function(m){return m.id!==id;}); saveState(); render(); }
+
+
+/* ─── SPECIAL PROJECTS ─── */
+
+function spCard(tab, color, title, sub, s1v, s1l, s2v, s2l, pctV) {
+  var bar = pctV >= 0
+    ? '<div style="width:72px"><div style="font-size:10px;font-family:var(--mono);color:var(--txtm);text-align:right;margin-bottom:3px">'+pctV+'%</div>'
+      + '<div class="prb" style="height:6px"><div class="prf'+(pctV<50?' re':pctV<100?' am':'')+'" style="width:'+pctV+'%"></div></div></div>'
+    : '';
+  return '<div onclick="setTab(\''+tab+'\')" style="cursor:pointer;background:var(--wh);border-radius:8px;border:1px solid var(--bdr);border-left:4px solid '+color
+    +';padding:18px 20px;box-shadow:var(--sh);margin-bottom:12px;display:flex;align-items:center;gap:16px">'
+    + '<div style="flex:1"><div style="font-family:var(--serif);font-size:17px;font-weight:700;color:var(--navy);margin-bottom:3px">'+title+'</div>'
+    + '<div style="font-size:11px;color:var(--txtm)">'+sub+'</div></div>'
+    + '<div style="display:flex;align-items:center;gap:18px;flex-shrink:0">'
+    + '<div style="text-align:right"><div style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--navy)">'+s1v+'</div><div style="font-size:10px;color:var(--txtm);font-family:var(--mono)">'+s1l+'</div></div>'
+    + (s2v !== null ? '<div style="text-align:right"><div style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--navy)">'+s2v+'</div><div style="font-size:10px;color:var(--txtm);font-family:var(--mono)">'+s2l+'</div></div>' : '')
+    + bar
+    + '<div style="color:var(--txtm);font-size:20px">&rsaquo;</div>'
+    + '</div></div>';
+}
+
+function renderSpecialProjects() {
+  var folio = S.folio||[], fDone = folio.filter(function(r){return r.st==='Complete';}).length;
+  var dLeft = Math.ceil((new Date('2026-06-30')-new Date())/86400000);
+  var flDone=0; CLIENTS.forEach(function(c){if((S.cx[c.id]||{fl:false}).fl)flDone++;});
+  var cxDone=0; CLIENTS.forEach(function(c){if((S.cx[c.id]||{st:'Not Started'}).st==='Done')cxDone++;});
+  var N = CLIENTS.length;
+  var html = '<div class="sh"><div><div class="st">Special Projects \u2014 2026</div>'
+    + '<div class="su">Click any project to open its full page and Notion database.</div></div></div>';
+  html += spCard('folio','var(--navy)','Folio \u2192 Schwab Migration','132 clients \u00b7 209 accounts \u00b7 June 30 deadline \u00b7 Kenson &amp; Catherine',
+    dLeft+'d','until Jun 30', fDone+'/132','complete', folio.length>0?pct(fDone,folio.length):0);
+  html += spCard('taxes','#7c3aed','Taxes','CPA contacts, RMDs, IRA contributions, 1099s \u00b7 Kenson',
+    'Notion','database', null,null, -1);
+  html += spCard('folders','#3b82f6','Folder Clean Up','SharePoint \u2192 Redtail \u00b7 Owner: Jackie',
+    flDone+'/'+N,'migrated', null,null, pct(flDone,N));
+  html += spCard('contracts','var(--green)','Contracts','Signed agreements for all Top 30 \u00b7 Owner: Jackie',
+    cxDone+'/'+N,'received', null,null, pct(cxDone,N));
+  html += spCard('dossiers','var(--amber)','Client Dossiers Created','Profile, preferences, family, CPA, interests \u00b7 Kenson &amp; Catherine',
+    'Notion','database', null,null, -1);
+  return html;
+}
+
+/* ─── FOLIO → SCHWAB ─── */
+function renderFolioPage() {
+  var folio=S.folio||[], fTotal=folio.length, fDone=folio.filter(function(r){return r.st==='Complete';}).length;
+  var dLeft=Math.ceil((new Date('2026-06-30')-new Date())/86400000);
+  var dCol=dLeft<30?'var(--red)':dLeft<60?'var(--amber)':'var(--navy)';
+  var fp=fTotal>0?pct(fDone,fTotal):0;
+  var html='<div class="sh"><div><div class="st">Folio \u2192 Schwab Migration</div>'
+    +'<div class="su">132 clients \u00b7 209 accounts \u00b7 Owner: Kenson &amp; Catherine. Track progress below as accounts are moved.</div></div>'
+    +'<div style="display:flex;align-items:center;gap:12px">'
+    +'<span style="font-family:var(--serif);font-size:22px;font-weight:700;color:'+dCol+'">'+dLeft+' days left</span>'
+    +'<span style="font-size:11px;color:var(--txtm);font-family:var(--mono)">June 30 deadline</span>'
+    +'</div></div>';
+  html+='<div class="sg sg4" style="margin-bottom:14px">'
+    +'<div class="sc '+(fDone===fTotal&&fTotal>0?'scg':fDone>0?'sca':'')+'"><div class="sl">Complete</div><div class="sv">'+fDone+'</div><div class="ss">transferred</div></div>'
+    +'<div class="sc"><div class="sl">In Progress</div><div class="sv">'+folio.filter(function(r){return r.st!=='Not Started'&&r.st!=='Complete';}).length+'</div></div>'
+    +'<div class="sc '+(fTotal>=132?'scg':'sca')+'"><div class="sl">Tracked</div><div class="sv">'+fTotal+'/132</div><div class="ss">in tracker</div></div>'
+    +'<div class="sc '+(fp===100?'scg':fp>0?'sca':'')+'"><div class="sl">Progress</div><div class="sv">'+fp+'%</div></div>'
+    +'</div>';
+  if(fTotal>0){html+='<div style="margin-bottom:14px"><div class="prb" style="height:10px"><div class="prf" style="width:'+fp+'%;background:var(--navy)"></div></div></div>';}
+  if(fTotal>0){
+    html+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">';
+    FOLIO_STATS.forEach(function(st){var cnt=folio.filter(function(r){return r.st===st;}).length;if(!cnt)return;var col=st==='Complete'?'var(--green)':st==='Transferred'?'#3b82f6':st==='Account Opened'?'var(--amber)':'var(--txtm)';html+='<span style="padding:3px 9px;border-radius:4px;font-size:11px;font-family:var(--mono);background:var(--bg);border:1px solid var(--bdr);color:'+col+'">'+st+': <strong>'+cnt+'</strong></span>';});
+    html+='</div>';
+  }
+  html+='<div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn bo sm" onclick="tog(\'folioForm\')">+ Add Client</button><button class="btn bo sm" onclick="tog(\'folioBulk\')">&#x2191; Paste List</button>'+(fTotal>0?'<button class="btn bd xs" style="margin-left:auto" onclick="clearFolio()">Clear All</button>':'')+'</div>';
+  html+='<div class="fp" id="folioForm"><div class="fgr c3"><div class="fgrp"><label>Client Name</label><input type="text" id="fName" placeholder="Last, First"></div><div class="fgrp"><label>Accounts</label><input type="number" id="fAccts" placeholder="#" min="1"></div><div class="fgrp"><label>Est. Value ($)</label><input type="number" id="fVal" placeholder="0"></div><div class="fgrp"><label>Status</label><select id="fSt">'+FOLIO_STATS.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div><div class="fgrp" style="grid-column:span 2"><label>Notes</label><input type="text" id="fNt" placeholder="Paperwork date, issues..."></div></div><div class="fa"><button class="btn bgh" onclick="tog(\'folioForm\')">Cancel</button><button class="btn bn" onclick="addFolio()">Add</button></div></div>';
+  html+='<div class="fp" id="folioBulk"><label style="font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--txtm);display:block;margin-bottom:6px">Paste names one per line</label><textarea id="folioBulkText" style="min-height:90px;width:100%;padding:8px;border:1px solid var(--bdr);border-radius:5px;font-size:12px;font-family:var(--mono);margin-bottom:8px" placeholder="BAXLEY, Johnnie\nBRADY, Kathleen\n..."></textarea><div class="fa"><button class="btn bgh" onclick="tog(\'folioBulk\')">Cancel</button><button class="btn bn" onclick="addFolioBulk()">Import</button></div></div>';
+  if(fTotal===0){html+='<div class="card" style="text-align:center;padding:36px;color:var(--txtm)">No clients added yet. Use Paste List to import the Folio export.</div>';}
+  else{
+    var sorted=folio.slice().sort(function(a,b){var o={'Complete':0,'Transferred':1,'Account Opened':2,'Paperwork Received':3,'Paperwork Sent':4,'Contacted':5,'Not Started':6};return(o[a.st]||6)-(o[b.st]||6);});
+    html+='<div class="card" style="padding:0"><div class="ts"><table><thead><tr><th>#</th><th>Client</th><th>Accts</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>';
+    sorted.forEach(function(r,i){var done=r.st==='Complete';html+='<tr style="background:'+(done?'var(--greenl)':'')+'"><td style="font-family:var(--mono);font-size:11px;color:var(--txtl)">'+String(i+1).padStart(2,'0')+'</td><td style="font-weight:600;color:'+(done?'var(--greend)':'')+'">'+r.name+'</td><td style="font-family:var(--mono);text-align:center">'+(r.accts||'\u2014')+'</td><td><select onchange="updateFolio(\''+r.id+'\',\'st\',this.value)" style="width:148px">'+FOLIO_STATS.map(function(s){return '<option'+(r.st===s?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td><td><input type="text" value="'+(r.nt||'').replace(/"/g,'&quot;')+'" placeholder="Notes..." onblur="updateFolio(\''+r.id+'\',\'nt\',this.value)" style="width:150px"></td><td><button class="btn bd xs" onclick="deleteFolio(\''+r.id+'\')">&#x2715;</button></td></tr>';});
+    html+='</tbody></table></div></div>';
+  }
+  return html;
+}
+
+/* ─── NOTION-LINKED PAGES ─── */
+function notionPageShell(title, sub, notionUrl, color, bodyHtml) {
+  var html='<div class="sh"><div><div class="st">'+title+'</div><div class="su">'+sub+'</div></div>'
+    +'<a href="'+notionUrl+'" target="_blank" class="btn bn" style="text-decoration:none;gap:6px;background:'+color+'">'
+    +'<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9"/><polyline points="9,1 13,1 13,5"/><line x1="7" y1="7" x2="13" y2="1"/></svg>'
+    +'Open in Notion \u2192</a></div>';
+  html += '<div class="card" style="border-left:4px solid '+color+';background:linear-gradient(135deg,var(--wh) 80%,'+color+'12);margin-bottom:16px">';
+  html += '<div style="display:flex;align-items:center;gap:14px;padding:6px 0">';
+  html += '<div style="width:40px;height:40px;border-radius:8px;background:'+color+'18;display:flex;align-items:center;justify-content:center;flex-shrink:0">';
+  html += '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="'+color+'" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>';
+  html += '</div>';
+  html += '<div><div style="font-weight:600;color:var(--navy);margin-bottom:3px">This project is managed in Notion</div>';
+  html += '<div style="font-size:12px;color:var(--txtm)">Click \u201cOpen in Notion\u201d above to view and update the full database. Data shown below is pulled from your local tracker.</div></div></div></div>';
+  html += bodyHtml;
+  return html;
+}
+
+function renderTaxesPage() {
+  return notionPageShell(
+    'Taxes',
+    'CPA contacts \u00b7 RMDs \u00b7 IRA contributions \u00b7 1099s \u00b7 Owner: Kenson',
+    'https://www.notion.so/2e2d8fce2e1880bea6b5fe0c8233ab79?v=342d8fce2e18808981fb000cd8506950',
+    '#7c3aed',
+    '<div class="card"><div class="ch"><div class="ct">What\u2019s tracked in this Notion database</div></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">'
+    + '<div style="padding:12px;background:var(--bg);border-radius:6px"><div style="font-weight:600;color:var(--navy);margin-bottom:4px">Per-Client Tax Info</div><div style="color:var(--txtm);font-size:12px">CPA name &amp; contact, filing status, tax year notes</div></div>'
+    + '<div style="padding:12px;background:var(--bg);border-radius:6px"><div style="font-weight:600;color:var(--navy);margin-bottom:4px">RMD Tracking</div><div style="color:var(--txtm);font-size:12px">Required minimum distributions sent, amounts, dates</div></div>'
+    + '<div style="padding:12px;background:var(--bg);border-radius:6px"><div style="font-weight:600;color:var(--navy);margin-bottom:4px">IRA Contributions</div><div style="color:var(--txtm);font-size:12px">2025 contributions status, amounts, deadlines</div></div>'
+    + '<div style="padding:12px;background:var(--bg);border-radius:6px"><div style="font-weight:600;color:var(--navy);margin-bottom:4px">1099 Distribution</div><div style="color:var(--txtm);font-size:12px">Tax documents sent, client confirmations</div></div>'
+    + '</div></div>'
+  );
+}
+
+function renderFoldersPage() {
+  var flDone=0; CLIENTS.forEach(function(c){if((S.cx[c.id]||{fl:false}).fl)flDone++;});
+  var flPct=pct(flDone,CLIENTS.length);
+  var outstanding=CLIENTS.filter(function(c){return !(S.cx[c.id]||{fl:false}).fl;}).map(function(c){return c.n.split(',')[0];});
+  var localBody='<div class="sg sg3" style="margin-bottom:14px">'
+    +'<div class="sc '+(flPct===100?'scg':'sca')+'"><div class="sl">Migrated</div><div class="sv">'+flDone+'</div><div class="ss">of '+CLIENTS.length+'</div></div>'
+    +'<div class="sc"><div class="sl">Outstanding</div><div class="sv">'+(CLIENTS.length-flDone)+'</div></div>'
+    +'<div class="sc"><div class="sl">Complete</div><div class="sv">'+flPct+'%</div></div>'
+    +'</div>';
+  localBody+='<div style="margin-bottom:14px"><div class="prb" style="height:9px"><div class="prf'+(flPct<50?' re':flPct<100?' am':'')+'" style="width:'+flPct+'%"></div></div></div>';
+  if(flPct<100)localBody+=alertBox(infoIcon()+' Outstanding: '+outstanding.join(', '),'ala');
+  else localBody+=alertBox(checkIcon()+' All folders migrated.','alg');
+  localBody+='<div class="card" style="padding:0"><div class="ts"><table><thead><tr><th>#</th><th>Client</th><th>Folder Status</th></tr></thead><tbody>';
+  CLIENTS.forEach(function(c,i){var fl=(S.cx[c.id]||{fl:false}).fl;localBody+='<tr style="background:'+(fl?'var(--greenl)':'')+'"><td style="font-family:var(--mono);font-size:11px;color:var(--txtl)">'+String(i+1).padStart(2,'0')+'</td><td style="font-weight:600;color:'+(fl?'var(--greend)':'')+'">'+c.n+'</td><td style="display:flex;align-items:center;gap:9px;padding:9px 13px"><input type="checkbox"'+(fl?' checked':'')+' onchange="updateCx(\''+c.id+'\',\'fl\',this.checked);render()"><span style="font-size:12px;color:'+(fl?'var(--green)':'var(--txtm)')+';">'+(fl?'Migrated \u2713':'Pending')+'</span></td></tr>';});
+  localBody+='</tbody></table></div></div>';
+  return notionPageShell('Folder Clean Up','SharePoint \u2192 Redtail \u00b7 Owner: Jackie','https://www.notion.so/2e2d8fce2e1880bea6b5fe0c8233ab79?v=342d8fce2e18806babb7000cb3ad4f94','#3b82f6',localBody);
+}
+
+function renderContractsPage() {
+  var notionUrl = 'https://www.notion.so/2e2d8fce2e1880bea6b5fe0c8233ab79?v=342d8fce2e188056aeed000c58e56876';
+  var notionSvg = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9"/><polyline points="9,1 13,1 13,5"/><line x1="7" y1="7" x2="13" y2="1"/></svg>';
+  var html = '<div class="sh"><div><div class="st">Contracts</div>'
+    + '<div class="su">Live from Notion · Read-only · Edit directly in Notion · Updates automatically</div></div>'
+    + '<a href="'+notionUrl+'" target="_blank" class="btn bn" style="text-decoration:none;gap:6px">'+notionSvg+'Edit in Notion →</a></div>';
+  html += '<div style="background:rgba(84,170,63,.07);border:1px solid rgba(84,170,63,.2);border-radius:8px;padding:13px 18px;display:flex;align-items:center;gap:11px;margin-bottom:18px">'
+    + '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="6"/><line x1="7" y1="5" x2="7" y2="8"/><circle cx="7" cy="10" r=".5" fill="var(--green)" stroke="none"/></svg>'
+    + '<span style="font-size:12px;color:var(--greend);line-height:1.5">This page is managed in Notion. Update contract status there — this view syncs automatically. <strong>“Received &amp; Uploaded”</strong> is the completed status.</span></div>';
+  html += '<div id="contractsData"><div style="text-align:center;padding:52px;color:var(--txtm)">'
+    + '<div style="width:36px;height:36px;border:2px solid var(--bdr);border-top-color:var(--navy);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>'
+    + '<div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase">Loading from Notion…</div></div></div>';
+  setTimeout(fetchContracts, 0);
+  return html;
+}
+
+function fetchContracts() {
+  fetch('/.netlify/functions/notion-contracts')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var el = document.getElementById('contractsData');
+      if (!el) return;
+
+      if (data.error) {
+        el.innerHTML = alertBox(warnIcon()+' Notion error: '+data.error
+          + (data.fieldNames ? '<br><span style="font-size:10px;font-family:var(--mono)">Fields found: '+data.fieldNames.join(', ')+'</span>' : ''), 'ala');
+        return;
+      }
+      if (!data.ok || !data.total) {
+        el.innerHTML = alertBox(infoIcon()+' No records returned from Notion. Check the integration has access to the Contracts database.'
+          + (data.fieldNames ? '<br><span style="font-size:10px;font-family:var(--mono)">Fields found: '+data.fieldNames.join(', ')+'</span>' : ''), 'ala');
+        return;
+      }
+
+      var done  = data.clients.filter(function(c){ return c.status === 'Received & Uploaded'; }).length;
+      var total = data.total;
+      var pctV  = Math.round(done / total * 100);
+
+      var html = '';
+      // Summary stats
+      html += '<div class="sg sg3" style="margin-bottom:14px">'
+        + '<div class="sc '+(pctV===100?'scg':pctV>50?'sca':'')+'"><div class="sl">Received &amp; Uploaded</div><div class="sv">'+done+'/'+total+'</div><div class="ss">contracts complete</div></div>'
+        + '<div class="sc '+(total-done>0?'sca':'scg')+'"><div class="sl">Outstanding</div><div class="sv">'+(total-done)+'</div><div class="ss">still needed</div></div>'
+        + '<div class="sc"><div class="sl">Complete</div><div class="sv">'+pctV+'%</div></div>'
+        + '</div>';
+      // Progress bar
+      html += '<div style="margin-bottom:16px"><div class="prb" style="height:10px"><div class="prf'+(pctV<50?' re':pctV<100?' am':'')+'" style="width:'+pctV+'%"></div></div></div>';
+      // Alert
+      if (done < total) {
+        var outstanding = data.clients.filter(function(c){ return c.status !== 'Received & Uploaded'; }).map(function(c){ return c.name; });
+        html += alertBox(infoIcon()+' Outstanding: '+outstanding.join(', '), 'ala');
+      } else {
+        html += alertBox(checkIcon()+' All '+total+' contracts received and uploaded.', 'alg');
+      }
+
+      // Grouped by client type — preferred tier order
+      var tierOrder = ['Alpha','Legacy','Anchor','NextGen','Other'];
+      var order = (data.groupOrder || Object.keys(data.grouped)).slice();
+      order.sort(function(a,b){
+        var ai = tierOrder.indexOf(a), bi = tierOrder.indexOf(b);
+        return (ai===-1?99:ai) - (bi===-1?99:bi);
+      });
+
+      order.forEach(function(tier) {
+        var clients = data.grouped[tier];
+        if (!clients || !clients.length) return;
+        var tierDone = clients.filter(function(c){ return c.status === 'Received & Uploaded'; }).length;
+        var tierColor = {Alpha:'var(--navy)',Legacy:'#7c3aed',Anchor:'#3b82f6',NextGen:'var(--green)'}[tier] || 'var(--txtm)';
+
+        html += '<div class="card" style="padding:0;margin-bottom:14px;border-top:3px solid '+tierColor+'">';
+        html += '<div style="padding:13px 18px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr)">';
+        html += '<div style="font-family:var(--serif);font-size:16px;font-weight:700;color:var(--navy)">'+tier+'</div>';
+        html += '<div style="font-size:11px;font-family:var(--mono);color:var(--txtm)">'+tierDone+'/'+clients.length+' complete</div>';
+        html += '</div>';
+        html += '<div class="ts"><table><thead><tr><th>#</th><th>Client Name</th><th>Contract Status</th><th>Notes</th></tr></thead><tbody>';
+
+        clients.forEach(function(c, i) {
+          var isComplete = c.status === 'Received & Uploaded';
+          var statusCol  = isComplete ? 'var(--greend)' : c.status ? 'var(--amber)' : 'var(--txtl)';
+          var statusDotEl= isComplete
+            ? '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--greend)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>'
+            : '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><line x1="6" y1="4" x2="6" y2="6.5"/><circle cx="6" cy="8.5" r=".5" fill="var(--amber)" stroke="none"/></svg>';
+          html += '<tr style="background:'+(isComplete?'var(--greenl)':'')+'">'
+            + '<td style="font-family:var(--mono);font-size:11px;color:var(--txtl)">'+String(i+1).padStart(2,'0')+'</td>'
+            + '<td style="font-weight:600;color:'+(isComplete?'var(--greend)':'var(--navy)')+'">'+c.name+'</td>'
+            + '<td><div style="display:flex;align-items:center;gap:7px">'+statusDotEl+'<span style="font-size:12px;color:'+statusCol+'">'+(c.status||'Not set')+'</span></div></td>'
+            + '<td style="font-size:12px;color:var(--txtm)">'+(c.notes||'—')+'</td>'
+            + '</tr>';
+        });
+
+        html += '</tbody></table></div></div>';
+      });
+
+      html += '<div style="text-align:right;font-size:10px;color:var(--txtl);font-family:var(--mono);margin-top:8px">'
+        + 'Last synced: '+new Date().toLocaleTimeString()+' · <a href="#" onclick="fetchContracts();return false" style="color:var(--navy)">Refresh</a></div>';
+
+      el.innerHTML = html;
+    })
+    .catch(function(err) {
+      var el = document.getElementById('contractsData');
+      if (el) el.innerHTML = alertBox(warnIcon()+' Could not reach Notion: '+err.message+'. Make sure the app is deployed to Netlify (local preview does not support functions).', 'ala');
+    });
+}
+
+
+function renderDossiersPage() {
+  return notionPageShell(
+    'Client Dossiers Created',
+    'Client profiles \u00b7 Preferences \u00b7 Family details \u00b7 CPA info \u00b7 Owner: Kenson &amp; Catherine',
+    'https://www.notion.so/2e2d8fce2e1880bea6b5fe0c8233ab79?v=342d8fce2e1880069151000cb64332e5',
+    'var(--amber)',
+    '<div class="card"><div class="ch"><div class="ct">What\u2019s in each client dossier</div></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">'
+    + '<div style="padding:12px;background:var(--bg);border-radius:6px"><div style="font-weight:600;color:var(--navy);margin-bottom:4px">Personal Profile</div><div style="color:var(--txtm);font-size:12px">Birthday, family members, hobbies, communication preferences</div></div>'
+    + '<div style="padding:12px;background:var(--bg);border-radius:6px"><div style="font-weight:600;color:var(--navy);margin-bottom:4px">Professional Details</div><div style="color:var(--txtm);font-size:12px">CPA name &amp; contact, employer, business interests</div></div>'
+    + '<div style="padding:12px;background:var(--bg);border-radius:6px"><div style="font-weight:600;color:var(--navy);margin-bottom:4px">Gift &amp; Event Preferences</div><div style="color:var(--txtm);font-size:12px">Interests, charities, favorite restaurants, past gifts</div></div>'
+    + '<div style="padding:12px;background:var(--bg);border-radius:6px"><div style="font-weight:600;color:var(--navy);margin-bottom:4px">Financial Notes</div><div style="color:var(--txtm);font-size:12px">Key accounts, life events, planning priorities</div></div>'
+    + '</div></div>'
+  );
+}
+
+
+// Folio CRUD
+function addFolio(){
+  var name=document.getElementById('fName').value.trim();
+  if(!name)return;
+  var accts=parseInt(document.getElementById('fAccts').value)||null;
+  var val=parseFloat(document.getElementById('fVal').value)||0;
+  var st=document.getElementById('fSt').value;
+  var nt=document.getElementById('fNt').value;
+  if(!S.folio)S.folio=[];
+  S.folio.push({id:uid(),name:name,accts:accts,val:val,st:st,nt:nt});
+  saveState();render();
+}
+function addFolioBulk(){
+  var raw=document.getElementById('folioBulkText').value;
+  var lines=raw.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+  if(!lines.length)return;
+  if(!S.folio)S.folio=[];
+  lines.forEach(function(name){
+    if(!S.folio.find(function(r){return r.name.toLowerCase()===name.toLowerCase();})){
+      S.folio.push({id:uid(),name:name,accts:null,val:0,st:'Not Started',nt:''});
+    }
+  });
+  saveState();render();
+}
+function updateFolio(id,field,val){
+  var r=S.folio.find(function(r){return r.id===id;});
+  if(r){r[field]=val;saveState();if(field==='st')render();}
+}
+function deleteFolio(id){S.folio=S.folio.filter(function(r){return r.id!==id;});saveState();render();}
+function clearFolio(){if(confirm('Clear all Folio migration records?')){S.folio=[];saveState();render();}}
+
+// IRA CRUD
+function addIRA(){
+  var name=document.getElementById('iraName').value.trim();
+  if(!name)return;
+  var amt=parseFloat(document.getElementById('iraAmt').value)||0;
+  var st=document.getElementById('iraSt').value;
+  var nt=document.getElementById('iraNt').value;
+  if(!S.ira)S.ira=[];
+  S.ira.push({id:uid(),name:name,amt:amt,st:st,nt:nt});
+  saveState();render();
+}
+function updateIRA(id,field,val){
+  var r=S.ira.find(function(r){return r.id===id;});
+  if(r){r[field]=val;saveState();if(field==='st')render();}
+}
+function deleteIRA(id){S.ira=S.ira.filter(function(r){return r.id!==id;});saveState();render();}
+function clearIRA(){if(confirm('Clear all IRA contribution records?')){S.ira=[];saveState();render();}}
+
+function updateCx(id,f,v){if(!S.cx[id])S.cx[id]={st:'Not Started',fl:false,nt:''};S.cx[id][f]=v;saveState();if(f!=='nt')render();}
+
+/* ─── REVENUE ─── */
+function renderRevenue() {
+  var bill=getBilling(), tot=bill.reduce(function(s,b){return s+(b.am||0);},0);
+  var over=Math.max(0,tot-180000), kA=over*.05, cBase=tot>=180000?1000:0, cT=cBase+over*.05;
+  var html='<div class="sh"><div><div class="st">Revenue Accelerator — '+S.q+' '+S.yr+'</div><div class="su">Billing tracked per quarter. Switch quarters above to view/enter each separately.</div></div><button class="btn bo sm" onclick="document.getElementById(\'xlFile\').click()">&#x2191; Upload Billing</button></div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">'+QS.map(function(q){var qBill=(S.bills&&S.bills[q])||[],qTot=qBill.reduce(function(s,b){return s+(b.am||0);},0),isA=q===S.q;return '<div style="background:'+(isA?'var(--navy)':'var(--wh)')+';border:1px solid '+(isA?'var(--navy)':'var(--bdr)')+';border-radius:6px;padding:12px 14px;cursor:pointer;text-align:center" onclick="setQuarter(\''+q+'\')"><div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:'+(isA?'rgba(255,255,255,.65)':'var(--txtm)')+';margin-bottom:4px">'+q+'</div><div style="font-family:var(--serif);font-size:20px;font-weight:700;color:'+(isA?'#fff':qTot>0?'var(--navy)':'var(--txtl)')+'">'+(qTot>0?money(qTot):'—')+'</div><div style="font-size:10px;color:'+(isA?'rgba(255,255,255,.45)':'var(--txtl)')+';margin-top:3px">'+(qTot>=180000?'✓ Baseline met':qTot>0?'Below baseline':'No data')+'</div></div>';}).join('')+'</div>';
+  html += '<div class="rs rs3" style="margin-bottom:22px"><div class="rc rcn"><div class="rv">'+(tot>0?money(tot):'$—')+'</div><div class="rl">'+S.q+' Total Billed</div></div><div class="rc rcg"><div class="rv" style="color:var(--greend)">'+money(kA)+'</div><div class="rl" style="color:#1a5c10">Kenson — Part 2</div><div style="font-size:10px;color:#3d8a2d;margin-top:5px">'+money(over)+' × 5%</div></div><div class="rc rcg"><div class="rv" style="color:var(--greend)">'+money(cT)+'</div><div class="rl" style="color:#1a5c10">Catherine — Part 2</div><div style="font-size:10px;color:#3d8a2d;margin-top:5px">'+(cBase>0?money(1000)+' base + ':'')+money(over*.05)+'</div></div></div>';
+  if (tot===0) html += '<div class="uz" onclick="document.getElementById(\'xlFile\').click()"><div style="margin-bottom:12px;opacity:.5"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="var(--navy)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="28" height="20" rx="3"/><polyline points="10,8 16,2 22,8"/><line x1="16" y1="2" x2="16" y2="20"/></svg></div><div style="font-size:14px;color:var(--txtm);font-weight:500">Upload '+S.q+' billing file</div><div style="font-size:11px;color:var(--txtl);margin-top:5px;font-family:var(--mono);letter-spacing:.04em">Accepts .xlsx, .xls, or .csv</div></div>';
+  html += '<div class="card"><div class="ch"><div class="ct">'+S.q+' Billing — '+bill.length+' records</div><div style="display:flex;gap:8px"><button class="btn bo xs" onclick="document.getElementById(\'xlFile\').click()">Re-upload</button>'+(bill.length>0?'<button class="btn bd xs" onclick="clearBilling()">Clear '+S.q+'</button>':'')+'<button class="btn bo xs" onclick="tog(\'bf\')">+ Add Row</button></div></div>';
+  html += '<div class="fp" id="bf"><div class="fgr c2"><div class="fgrp"><label>Client / Account</label><input type="text" id="bc"></div><div class="fgrp"><label>Amount ($)</label><input type="number" id="ba"></div></div><div class="fa"><button class="btn bgh" onclick="tog(\'bf\')">Cancel</button><button class="btn bn" onclick="addBillRow()">Add</button></div></div>';
+  if (bill.length===0) html += '<div style="text-align:center;padding:28px;color:var(--txtm)">Upload billing file or add rows manually.</div>';
+  else { html += '<div class="ts"><table><thead><tr><th>Client / Account</th><th style="text-align:right">Amount</th><th></th></tr></thead><tbody>'+bill.slice().sort(function(a,b){return b.am-a.am;}).map(function(b){return '<tr><td>'+b.cl+'</td><td style="text-align:right;font-family:var(--mono);font-weight:600">'+money(b.am)+'</td><td><button class="btn bd xs" onclick="deleteBillRow(\''+b.id+'\')">&#x2715;</button></td></tr>';}).join('')+'<tr style="background:var(--bg)"><td style="font-family:var(--serif);font-size:15px;font-weight:700">Total</td><td style="text-align:right;font-family:var(--mono);font-size:15px;font-weight:600;color:var(--navy)">'+money(tot)+'</td><td></td></tr></tbody></table></div>'; }
+  html += '</div>';
+  return html;
+}
+function handleXL(e){var file=e.target.files[0];if(!file)return;var rd=new FileReader();rd.onload=function(ev){try{var rows=[];if(file.name.endsWith('.csv')){var lines=ev.target.result.split('\n').filter(function(l){return l.trim();});var h=lines[0].split(',').map(function(x){return x.trim().toLowerCase().replace(/"/g,'');});var ci=h.findIndex(function(x){return x.includes('client')||x.includes('name')||x.includes('account');});var ai=h.findIndex(function(x){return x.includes('amount')||x.includes('fee')||x.includes('revenue');});for(var i=1;i<lines.length;i++){var c=lines[i].split(',');var cl=(c[ci>=0?ci:0]||'').trim().replace(/"/g,'');var am=parseFloat((c[ai>=0?ai:1]||'').replace(/[^0-9.]/g,''));if(cl&&!isNaN(am)&&am>0)rows.push({id:uid(),cl:cl,am:am});}}else{var wb=XLSX.read(ev.target.result,{type:'array'});var ws=wb.Sheets[wb.SheetNames[0]];var data=XLSX.utils.sheet_to_json(ws,{header:1});if(data.length>1){var h2=data[0].map(function(x){return String(x).toLowerCase();});var ci2=h2.findIndex(function(x){return x.includes('client')||x.includes('name')||x.includes('account');});var ai2=h2.findIndex(function(x){return x.includes('amount')||x.includes('fee')||x.includes('revenue');});for(var j=1;j<data.length;j++){var r=data[j];var cl2=String(r[ci2>=0?ci2:0]||'').trim();var am2=parseFloat(String(r[ai2>=0?ai2:1]||'').replace(/[^0-9.]/g,''));if(cl2&&!isNaN(am2)&&am2>0)rows.push({id:uid(),cl:cl2,am:am2});}}}if(rows.length>0){setBilling(rows);render();alert('Imported '+rows.length+' rows for '+S.q+'.');}else alert('No valid data found.');}catch(err){alert('Error: '+err.message);}};if(file.name.endsWith('.csv'))rd.readAsText(file);else rd.readAsArrayBuffer(file);e.target.value='';}
+function addBillRow(){var cl=document.getElementById('bc').value.trim(),am=parseFloat(document.getElementById('ba').value)||0;if(!cl||am<=0)return;var bill=getBilling();bill.push({id:uid(),cl:cl,am:am});setBilling(bill);render();}
+function deleteBillRow(id){setBilling(getBilling().filter(function(b){return b.id!==id;}));render();}
+function clearBilling(){if(confirm('Clear all billing data for '+S.q+'?')){setBilling([]);render();}}
+
+function exportData(){var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='alphavest-kpi-2026-'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(url);}
+function importData(e){var file=e.target.files[0];if(!file)return;var rd=new FileReader();rd.onload=function(ev){try{var p=JSON.parse(ev.target.result);S=Object.assign(fresh(),p);if(!S.gr)S.gr={refs:[],exp:[],opp:[]};['refs','exp','opp'].forEach(function(k){if(!S.gr[k])S.gr[k]=[];});if(!S.bills){S.bills={};QS.forEach(function(q){S.bills[q]=[];})}if(!S.calChecks)S.calChecks={};if(!S.folio)S.folio=[];if(!S.ira)S.ira=[];CLIENTS.forEach(function(c){if(!S.cx[c.id])S.cx[c.id]={st:c.cx,fl:false,nt:''};});saveState();buildPills();render();alert('Data imported.');}catch(err){alert('Invalid file.');}};rd.readAsText(file);e.target.value='';}
+
+function buildPills() {
+  var months = QM[S.q];
+  var yrEl = document.getElementById('yrToggle');
+  if (yrEl) yrEl.innerHTML = [2025,2026].map(function(y){ return '<button class="yrb'+(S.viewYear===y?' on':'')+'" onclick="setViewYear('+y+')">'+y+'</button>'; }).join('');
+  document.getElementById('qPills').innerHTML = QS.map(function(q){ return '<button class="qp'+(q===S.q?' on':'')+'" onclick="setQuarter(\''+q+'\')">'+q+'</button>'; }).join('');
+  document.getElementById('mPills').innerHTML = months.map(function(m,i){ return '<button class="mpb'+(i===S.mo?' on':'')+'" onclick="setMonth('+i+')">'+m.substr(0,3)+'</button>'; }).join('');
+}
+function setViewYear(y) { S.viewYear=y; saveState(); buildPills(); if(curTab==='dash') render(); }
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadState();
+  buildPills();
+  render();
+
+  var nav = document.getElementById('mainNav');
+  nav.addEventListener('click', function(e) {
+    var parent = e.target.closest('.mnav-parent');
+    if (parent) {
+      var grp = parent.closest('.mnav-group');
+      var wasOpen = grp.classList.contains('open');
+      document.querySelectorAll('.mnav-group').forEach(function(g) { g.classList.remove('open'); });
+      if (!wasOpen) grp.classList.add('open');
+      return;
+    }
+    var tab = e.target.closest('[data-tab]');
+    if (tab) { setTab(tab.dataset.tab); }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.mainnav')) {
+      document.querySelectorAll('.mnav-group').forEach(function(g) { g.classList.remove('open'); });
+    }
+  });
+});
+</script>
+<div style="text-align:center;padding:20px 28px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--txtl);border-top:1px solid var(--bdr);margin-top:40px">
+  Owned &amp; Managed by <span style="color:var(--navy);font-weight:600">Business Powerhouse Inc</span>
+</div>
+</body>
+</html>
