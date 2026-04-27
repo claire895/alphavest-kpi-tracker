@@ -1285,11 +1285,11 @@ function renderContractsPage() {
   var notionUrl = 'https://www.notion.so/2e2d8fce2e1880bea6b5fe0c8233ab79?v=342d8fce2e188056aeed000c58e56876';
   var notionSvg = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9"/><polyline points="9,1 13,1 13,5"/><line x1="7" y1="7" x2="13" y2="1"/></svg>';
   var html = '<div class="sh"><div><div class="st">Contracts</div>'
-    + '<div class="su">Live from Notion · Read-only · Edit directly in Notion · Updates automatically</div></div>'
+    + '<div class="su">Live from Notion · Read-only · Edit directly in Notion · Refreshes automatically</div></div>'
     + '<a href="'+notionUrl+'" target="_blank" class="btn bn" style="text-decoration:none;gap:6px">'+notionSvg+'Edit in Notion →</a></div>';
   html += '<div style="background:rgba(84,170,63,.07);border:1px solid rgba(84,170,63,.2);border-radius:8px;padding:13px 18px;display:flex;align-items:center;gap:11px;margin-bottom:18px">'
     + '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="6"/><line x1="7" y1="5" x2="7" y2="8"/><circle cx="7" cy="10" r=".5" fill="var(--green)" stroke="none"/></svg>'
-    + '<span style="font-size:12px;color:var(--greend);line-height:1.5">This page is managed in Notion. Update contract status there — this view syncs automatically. <strong>“Received &amp; Uploaded”</strong> is the completed status.</span></div>';
+    + '<span style="font-size:12px;color:var(--greend);line-height:1.5">Managed in Notion. <strong>“Received &amp; Uploaded”</strong> = complete · <strong>“Sent Via Mail”</strong> = awaiting return.</span></div>';
   html += '<div id="contractsData"><div style="text-align:center;padding:52px;color:var(--txtm)">'
     + '<div style="width:36px;height:36px;border:2px solid var(--bdr);border-top-color:var(--navy);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>'
     + '<div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase">Loading from Notion…</div></div></div>';
@@ -1303,70 +1303,109 @@ function fetchContracts() {
     .then(function(data) {
       var el = document.getElementById('contractsData');
       if (!el) return;
-
       if (data.error) {
-        el.innerHTML = alertBox(warnIcon()+' Notion error: '+data.error
-          + (data.fieldNames ? '<br><span style="font-size:10px;font-family:var(--mono)">Fields found: '+data.fieldNames.join(', ')+'</span>' : ''), 'ala');
-        return;
-      }
-      if (!data.ok || !data.total) {
-        el.innerHTML = alertBox(infoIcon()+' No records returned from Notion. Check the integration has access to the Contracts database.'
-          + (data.fieldNames ? '<br><span style="font-size:10px;font-family:var(--mono)">Fields found: '+data.fieldNames.join(', ')+'</span>' : ''), 'ala');
+        el.innerHTML = alertBox(warnIcon()+' Notion error: '+data.error, 'ala');
         return;
       }
 
-      var done  = data.clients.filter(function(c){ return c.status === 'Received & Uploaded'; }).length;
-      var total = data.total;
-      var pctV  = Math.round(done / total * 100);
+      // Clean up group name — strip leading "1. " "2. " etc
+      function cleanTier(t) {
+        return t.replace(/^\d+\.\s*/, '').replace(' (Top 30)', '').replace(' (Hiers)', '');
+      }
+
+      // Only count active client types for progress stats
+      var activeTypes = ['1. Alpha Client (Top 30)', '2. Legacy Client', '3. Anchor Client', '4. NexGen Client (Hiers)'];
+      var activeClients = data.clients.filter(function(c){ return activeTypes.indexOf(c.clientType) >= 0; });
+      var done    = activeClients.filter(function(c){ return c.status === 'Received & Uploaded'; }).length;
+      var mailed  = activeClients.filter(function(c){ return c.status === 'Sent Via Mail'; }).length;
+      var total   = activeClients.length;
+      var pctV    = Math.round(done / total * 100);
 
       var html = '';
-      // Summary stats
-      html += '<div class="sg sg3" style="margin-bottom:14px">'
-        + '<div class="sc '+(pctV===100?'scg':pctV>50?'sca':'')+'"><div class="sl">Received &amp; Uploaded</div><div class="sv">'+done+'/'+total+'</div><div class="ss">contracts complete</div></div>'
-        + '<div class="sc '+(total-done>0?'sca':'scg')+'"><div class="sl">Outstanding</div><div class="sv">'+(total-done)+'</div><div class="ss">still needed</div></div>'
+      // Summary stats — active clients only
+      html += '<div class="sg sg4" style="margin-bottom:14px">'
+        + '<div class="sc '+(pctV===100?'scg':pctV>50?'sca':'')+'"><div class="sl">Received &amp; Uploaded</div><div class="sv">'+done+'</div><div class="ss">of '+total+' active clients</div></div>'
+        + '<div class="sc sca"><div class="sl">Sent Via Mail</div><div class="sv">'+mailed+'</div><div class="ss">awaiting return</div></div>'
+        + '<div class="sc '+(total-done-mailed>0?'scr':'scg')+'"><div class="sl">Not Started</div><div class="sv">'+(total-done-mailed)+'</div><div class="ss">need outreach</div></div>'
         + '<div class="sc"><div class="sl">Complete</div><div class="sv">'+pctV+'%</div></div>'
         + '</div>';
       // Progress bar
-      html += '<div style="margin-bottom:16px"><div class="prb" style="height:10px"><div class="prf'+(pctV<50?' re':pctV<100?' am':'')+'" style="width:'+pctV+'%"></div></div></div>';
-      // Alert
+      html += '<div style="margin-bottom:16px"><div class="prb" style="height:10px">'
+        + '<div style="height:100%;width:'+pctV+'%;background:var(--green);border-radius:4px;display:inline-block"></div>'
+        + '<div style="height:100%;width:'+Math.round(mailed/total*100)+'%;background:var(--amber);border-radius:4px;display:inline-block;margin-left:1px"></div>'
+        + '</div>'
+        + '<div style="display:flex;gap:16px;margin-top:5px;font-size:10px;font-family:var(--mono);color:var(--txtm)">'
+        + '<span style="color:var(--greend)">■ Received ('+done+')</span>'
+        + '<span style="color:var(--amber)">■ Sent Via Mail ('+mailed+')</span>'
+        + '<span>■ Not Started ('+(total-done-mailed)+')</span>'
+        + '</div></div>';
+
       if (done < total) {
-        var outstanding = data.clients.filter(function(c){ return c.status !== 'Received & Uploaded'; }).map(function(c){ return c.name; });
-        html += alertBox(infoIcon()+' Outstanding: '+outstanding.join(', '), 'ala');
+        var outstanding = activeClients.filter(function(c){ return c.status !== 'Received & Uploaded' && c.status !== 'Sent Via Mail'; }).map(function(c){ return c.name; });
+        if (outstanding.length) html += alertBox(infoIcon()+' Not yet contacted: '+outstanding.join(', '), 'ala');
       } else {
-        html += alertBox(checkIcon()+' All '+total+' contracts received and uploaded.', 'alg');
+        html += alertBox(checkIcon()+' All '+total+' active client contracts received.', 'alg');
       }
 
-      // Grouped by client type — preferred tier order
-      var tierOrder = ['Alpha','Legacy','Anchor','NextGen','Other'];
-      var order = (data.groupOrder || Object.keys(data.grouped)).slice();
-      order.sort(function(a,b){
-        var ai = tierOrder.indexOf(a), bi = tierOrder.indexOf(b);
-        return (ai===-1?99:ai) - (bi===-1?99:bi);
-      });
+      // Tier display order
+      var tierOrder = [
+        '1. Alpha Client (Top 30)',
+        '2. Legacy Client',
+        '3. Anchor Client',
+        '4. NexGen Client (Hiers)',
+        'Inactive Clients',
+        'Family (No Fee)',
+        'Deceased',
+        'Other'
+      ];
+      var tierColors = {
+        '1. Alpha Client (Top 30)': 'var(--navy)',
+        '2. Legacy Client': '#7c3aed',
+        '3. Anchor Client': '#3b82f6',
+        '4. NexGen Client (Hiers)': 'var(--green)',
+        'Inactive Clients': 'var(--txtl)',
+        'Family (No Fee)': 'var(--txtl)',
+        'Deceased': 'var(--txtl)',
+        'Other': 'var(--txtl)'
+      };
+      // Non-active tiers collapsed by default
+      var inactiveTiers = ['Inactive Clients','Family (No Fee)','Deceased','Other'];
 
-      order.forEach(function(tier) {
+      tierOrder.forEach(function(tier) {
         var clients = data.grouped[tier];
         if (!clients || !clients.length) return;
-        var tierDone = clients.filter(function(c){ return c.status === 'Received & Uploaded'; }).length;
-        var tierColor = {Alpha:'var(--navy)',Legacy:'#7c3aed',Anchor:'#3b82f6',NextGen:'var(--green)'}[tier] || 'var(--txtm)';
+        var isInactive = inactiveTiers.indexOf(tier) >= 0;
+        var tierDone   = clients.filter(function(c){ return c.status === 'Received & Uploaded'; }).length;
+        var tierMailed = clients.filter(function(c){ return c.status === 'Sent Via Mail'; }).length;
+        var color      = tierColors[tier] || 'var(--txtm)';
+        var label      = cleanTier(tier);
 
-        html += '<div class="card" style="padding:0;margin-bottom:14px;border-top:3px solid '+tierColor+'">';
-        html += '<div style="padding:13px 18px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr)">';
-        html += '<div style="font-family:var(--serif);font-size:16px;font-weight:700;color:var(--navy)">'+tier+'</div>';
-        html += '<div style="font-size:11px;font-family:var(--mono);color:var(--txtm)">'+tierDone+'/'+clients.length+' complete</div>';
-        html += '</div>';
+        html += '<div class="card" style="padding:0;margin-bottom:12px;border-top:3px solid '+color+';'+(isInactive?'opacity:.7':'')+';">';
+        html += '<div style="padding:12px 18px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr)">';
+        html += '<div style="font-family:var(--serif);font-size:16px;font-weight:700;color:var(--navy)">'+label+'</div>';
+        html += '<div style="display:flex;align-items:center;gap:14px">';
+        html += '<span style="font-size:11px;font-family:var(--mono);color:var(--greend)">'+tierDone+' received</span>';
+        if (tierMailed) html += '<span style="font-size:11px;font-family:var(--mono);color:var(--amber)">'+tierMailed+' sent via mail</span>';
+        html += '<span style="font-size:11px;font-family:var(--mono);color:var(--txtm)">'+clients.length+' total</span>';
+        html += '</div></div>';
         html += '<div class="ts"><table><thead><tr><th>#</th><th>Client Name</th><th>Contract Status</th><th>Notes</th></tr></thead><tbody>';
 
         clients.forEach(function(c, i) {
           var isComplete = c.status === 'Received & Uploaded';
-          var statusCol  = isComplete ? 'var(--greend)' : c.status ? 'var(--amber)' : 'var(--txtl)';
-          var statusDotEl= isComplete
+          var isMailed   = c.status === 'Sent Via Mail';
+          var rowBg      = isComplete ? 'var(--greenl)' : isMailed ? '#fffbf0' : '';
+          var nameCol    = isComplete ? 'var(--greend)' : 'var(--navy)';
+          var statusCol  = isComplete ? 'var(--greend)' : isMailed ? 'var(--amber)' : c.status ? 'var(--txtm)' : 'var(--txtl)';
+          var statusIcon = isComplete
             ? '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--greend)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>'
-            : '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><line x1="6" y1="4" x2="6" y2="6.5"/><circle cx="6" cy="8.5" r=".5" fill="var(--amber)" stroke="none"/></svg>';
-          html += '<tr style="background:'+(isComplete?'var(--greenl)':'')+'">'
+            : isMailed
+              ? '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="3" width="10" height="7" rx="1"/><polyline points="1,3 6,7 11,3"/></svg>'
+              : '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--txtl)" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="5"/></svg>';
+          html += '<tr style="background:'+rowBg+'">'
             + '<td style="font-family:var(--mono);font-size:11px;color:var(--txtl)">'+String(i+1).padStart(2,'0')+'</td>'
-            + '<td style="font-weight:600;color:'+(isComplete?'var(--greend)':'var(--navy)')+'">'+c.name+'</td>'
-            + '<td><div style="display:flex;align-items:center;gap:7px">'+statusDotEl+'<span style="font-size:12px;color:'+statusCol+'">'+(c.status||'Not set')+'</span></div></td>'
+            + '<td style="font-weight:600;color:'+nameCol+'">'+c.name+'</td>'
+            + '<td><div style="display:flex;align-items:center;gap:7px">'+statusIcon
+            + '<span style="font-size:12px;color:'+statusCol+'">'+(c.status||'Not set')+'</span></div></td>'
             + '<td style="font-size:12px;color:var(--txtm)">'+(c.notes||'—')+'</td>'
             + '</tr>';
         });
@@ -1375,13 +1414,14 @@ function fetchContracts() {
       });
 
       html += '<div style="text-align:right;font-size:10px;color:var(--txtl);font-family:var(--mono);margin-top:8px">'
-        + 'Last synced: '+new Date().toLocaleTimeString()+' · <a href="#" onclick="fetchContracts();return false" style="color:var(--navy)">Refresh</a></div>';
+        + 'Synced from Notion at '+new Date().toLocaleTimeString()
+        + ' · <a href="#" onclick="fetchContracts();return false" style="color:var(--navy)">Refresh</a></div>';
 
       el.innerHTML = html;
     })
     .catch(function(err) {
       var el = document.getElementById('contractsData');
-      if (el) el.innerHTML = alertBox(warnIcon()+' Could not reach Notion: '+err.message+'. Make sure the app is deployed to Netlify (local preview does not support functions).', 'ala');
+      if (el) el.innerHTML = alertBox(warnIcon()+' Could not reach Notion: '+err.message, 'ala');
     });
 }
 
